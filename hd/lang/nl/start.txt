@@ -14,7 +14,7 @@
 height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=green>{Genealogical<br>data base}</font></h1>
+<h1><font color=green>Genealogische<br>databank</font></h1>
 </td>
 </tr>
 </table>
@@ -25,7 +25,7 @@ height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-Deze verzameling <font color=green><b>"%t"</b></font> heeft nu %n
+Deze databank <font color=green><b>"%t"</b></font> bevat nu %n
 personen.%o<br>(<a href="%sm=NOTES">[note/notes]1</a>)%o
 
 %y<br><p>
@@ -33,10 +33,10 @@ personen.%o<br>(<a href="%sm=NOTES">[note/notes]1</a>)%o
 <table border=0 width="70%">
 <tr>
 
-<td align=center><a href="%sw=w"><em>Wijzigen</em></a> toegang<br>
+<td align=center><a href="%sw=w">Toegang als <em>tovenaar</em></a><br>
 (wachtwoord)</td>
 
-%y%z<td align=center><a href="%sw=f"><em>Vriend</em></a> toegang<br>
+%y%z<td align=center><a href="%sw=f">Toegang als <em>vriend</em></a><br>
 (wachtwoord)</td>
 
 %z%y</tr></table>
@@ -46,7 +46,8 @@ personen.%o<br>(<a href="%sm=NOTES">[note/notes]1</a>)%o
 <table border=0>
 <tr><td align=center>
 <form method=get action="%f">
-%h<font size=-1>Wachtwoord, voor <em>vriend</em> of <em>wijzigen</em> toegang:
+%h<font size=-1>Wachtwoord, voor toegang als <em>vriend</em> of
+<em>tovenaar</em>:
 <input name=w size=10 maxlength=200>
 </form>
 </td></tr>
@@ -58,7 +59,7 @@ personen.%o<br>(<a href="%sm=NOTES">[note/notes]1</a>)%o
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-{To navigate in this data base, you can do your search}:<br><br>
+Om deze databank te consulteren, kan u een opzoeking doen:<br><br>
 
 <ul>
 
@@ -66,7 +67,7 @@ personen.%o<br>(<a href="%sm=NOTES">[note/notes]1</a>)%o
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=green><b>{by person}</b></font>
+<font color=green><b>op naam</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -76,7 +77,7 @@ personen.%o<br>(<a href="%sm=NOTES">[note/notes]1</a>)%o
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
 [or] <em>[surname/surnames]</em>%u
-[or] <em>Sosa number</em> relative to %a%u
+[or] <em>Sosa nummer</em> ten opzichte van %a%u
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
@@ -93,16 +94,16 @@ personen.%o<br>(<a href="%sm=NOTES">[note/notes]1</a>)%o
 <input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
 <br>
-ex:
-<font color=green><b>[title/titles]</b></font>: roi, duke...
-<font color=green><b>[place]</b></font>: de France, of Sax...
+vb:
+<font color=green><b>[title/titles]</b></font>: koning, hertog...
+<font color=green><b>[place]</b></font>: van Frankrijk, van Brabant...
 </form>
 
 <li>
 
 <form method=GET action="%f">
 %h
-<font color=green><b>{by the list}</b></font> {of all}
+<font color=green><b>via de lijst</b></font> van alle
 <select name=m>
 <option value="N" selected>familienamen
 <option value="P">voornamen
@@ -117,7 +118,7 @@ volgens
 
 <li>
 
-<font color=green><b>{by the}</b></font>
+<font color=green><b>via een</b></font>
 <a href="%sm=H;v=advanced"><font color=green><b>gedetailleerde
 opzoeking</b></font></a>.
 
@@ -125,18 +126,18 @@ opzoeking</b></font></a>.
 
 %w<p>
 
-<center>{You can}<br><br>
+<center>U kan:<br><br>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
-<li><a href="%sm=ADD_FAM">{add a family}</a>
+<li><a href="%sm=ADD_FAM">een familie toevoegen</a>
 </ul>
 </td>
 <td align=left>
 <ul>
-<li><a href="%sm=MOD_NOTES">{modify the notes}</a>
+<li><a href="%sm=MOD_NOTES">de nota's wijzigen</a>
 </ul>
 </td>
 </tr>
@@ -145,7 +146,7 @@ opzoeking</b></font></a>.
 <br>
 %w
 
-<center>{You can also consult}<br><br>
+<center>U kan de volgende zaken bekijken:<br><br>
 
 <table border=0>
 <tr>
