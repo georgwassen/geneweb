@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_sheet.ml,v 1.1.2.1 1999-04-11 01:19:14 ddr Exp $ *)
+(* $Id: pa_sheet.ml,v 1.1.2.2 1999-04-11 10:12:22 ddr Exp $ *)
 
 value token_of_xast =
   fun
@@ -127,7 +127,7 @@ value expr_of_expr_list loc =
 ;
 
 value defs =
-  let loc = (1, 1) in
+  let loc = (0, 0) in
   List.map (fun x -> (x, loc))
     [<:str_item< open Def >>;
      <:str_item< open GlobDef >>]
