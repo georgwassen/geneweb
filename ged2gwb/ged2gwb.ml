@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.1 1999-03-08 11:17:48 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.1.2.1 1999-03-13 21:27:28 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1102,7 +1102,12 @@ value make_gen2 gen r =
 do Printf.printf "%s %s\n" r.rlab r.rval; flush stdout; return
 *)
   match r.rlab with
-  [ "INDI" -> add_indi gen r
+  [ "HEAD" ->
+      do Printf.eprintf "*** Header ok\n";
+         flush stderr;
+         treat_header r;
+      return ()
+  | "INDI" -> add_indi gen r
   | _ -> () ]
 ;
 
@@ -1111,11 +1116,7 @@ value make_gen3 gen r =
 do Printf.printf "%s %s\n" r.rlab r.rval; flush stdout; return
 *)
   match r.rlab with
-  [ "HEAD" ->
-      do Printf.eprintf "*** Header ok\n";
-         flush stderr;
-         treat_header r;
-      return ()
+  [ "HEAD" -> ()
   | "SUBM" -> ()
   | "INDI" -> ()
   | "FAM" -> add_fam gen r
