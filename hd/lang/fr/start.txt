@@ -120,9 +120,9 @@ color=green><b>requ&ecirc;te &eacute;volu&eacute;e</b></font></a>.
 
 %w<p>
 
-<center>Vous pouvez</center><br>
+<center>Vous pouvez<br><br>
 
-<table border=0 width="100%">
+<table border=0>
 <tr>
 <td align=right>
 <ul>
@@ -136,10 +136,11 @@ color=green><b>requ&ecirc;te &eacute;volu&eacute;e</b></font></a>.
 </td>
 </tr>
 </table>
+</center>
 <br>
 %w
 
-<center>Vous pouvez également consulter</center><br>
+<center>Vous pouvez également consulter<br><br>
 
 <table border=0>
 <tr>
@@ -162,6 +163,7 @@ d&eacute;c&eacute;d&eacute;es</a>
 </td>
 </tr>
 </table>
+</center>
 
 <p>
 
@@ -170,7 +172,7 @@ Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
 </td></tr>
 
 <tr>
-<td align=right><font size=-1><em><a
+<td align=right><br><font size=-1><em><a
 href="%sm=LEX">lexicon</a></em></font></td>
 </tr>
 

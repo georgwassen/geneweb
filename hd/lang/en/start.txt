@@ -35,10 +35,10 @@ The data base <font color=green><b>"%t"</b></font> now holds %n persons%o<br>
 <tr>
 
 <td align=center><a href="%sw=w"><em>Wizard</em></a> access<br>
-(password).</td>
+(password)</td>
 
 %y%z<td align=center><a href="%sw=f"><em>Friend</em></a> access<br>
-(password).</td>
+(password)</td>
 
 %z%y</tr></table>
 
@@ -67,8 +67,8 @@ To navigate in this data base, you can do your search:<br><br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=green><b>by person</b></font> <input name=n size=40
-maxlength=200>
+<font color=green><b>by person</b></font>
+<input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
 <ul>
@@ -118,9 +118,9 @@ request</b></font></a>.
 
 %w<p>
 
-<center>You can</center><br>
+<center>You can<br><br>
 
-<table border=0 width="100%">
+<table border=0>
 <tr>
 <td align=right>
 <ul>
@@ -134,11 +134,11 @@ request</b></font></a>.
 </td>
 </tr>
 </table>
+</center>
 <br>
 %w
 
-
-<center>You can also consult</center><br>
+<center>You can also consult<br><br>
 
 <table border=0>
 <tr>
@@ -160,6 +160,7 @@ request</b></font></a>.
 </td>
 </tr>
 </table>
+</center>
 
 <p>
 
@@ -168,7 +169,7 @@ There has been %q accesses, %c of them to this page, since %d.
 </td></tr>
 
 <tr>
-<td align=right><font size=-1><em><a
+<td align=right><br><font size=-1><em><a
 href="%sm=LEX">lexicon</a></em></font></td>
 </tr>
 
