@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.29.2.3 1999-10-24 16:25:25 ddr Exp $ *)
+(* $Id: update.ml,v 2.29.2.4 1999-10-24 17:15:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -881,13 +881,14 @@ value print conf base p =
            begin
              Wserver.wprint "%s" (capitale (transl_decline conf "merge" ""));
            end;
+           Wserver.wprint "<br>\n";
      	   match a.parents with
      	   [ Some _ -> ()
      	   | None ->
      	       if p_first_name base p = "?" || p_surname base p = "?" then ()
      	       else
-                 let s = transl conf "parents" in              
-     		 do Wserver.wprint "<br>\n";
+                 let s = transl conf "parents" in
+                 do Wserver.wprint "<br>\n";
                     Wserver.wprint "<a href=\"%sm=ADD_PAR;i=%d\">%s</a><br>\n"
      		      (commd conf) (Adef.int_of_iper p.cle_index)
                       (capitale (transl_decline conf "add" s));

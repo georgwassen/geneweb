@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.31.2.2 1999-10-24 14:46:18 ddr Exp $ *)
+(* $Id: descend.ml,v 2.31.2.3 1999-10-24 17:15:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -96,19 +96,11 @@ value print_choice conf base p niveau_effectif =
     tag "table" "border=%d width=\"90%%\"" conf.border begin
       tag "tr" begin
         tag "td" begin
-          Wserver.wprint "<input type=radio name=t value=L checked> %s\n"
+          Wserver.wprint "<input type=radio name=t value=L checked> %s<br>\n"
             (capitale (transl conf "list"));
-        end;
-        tag "td" begin
-          Wserver.wprint "<input type=radio name=t value=N> %s\n"
-            (capitale (transl conf "families with encoding"));
-        end;
-      end;
-      tag "tr" begin
-        tag "td" begin
-          if browser_doesnt_have_tables conf then Wserver.wprint "&nbsp;\n"
+          if browser_doesnt_have_tables conf then ()
           else
-            Wserver.wprint "<input type=radio name=t value=T> %s\n"
+            Wserver.wprint "<input type=radio name=t value=T> %s<br>\n"
               (capitale (transl conf "tree"));
             if niveau_effectif <= limit_by_tree then ()
             else
@@ -117,19 +109,15 @@ value print_choice conf base p niveau_effectif =
                    limit_by_tree;
                  Wserver.wprint ")\n";
               return ();
-        end;
-        tag "td" begin
-          Wserver.wprint "<input type=radio name=t value=G> - %s\n"
-            (capitale (transl conf "index of the descendants"));
-        end;
-      end;
-      tag "tr" begin
-        tag "td" begin
-          Wserver.wprint "<input type=radio name=t value=S> %s\n"
+          Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
             (capitale (transl conf "only the generation selected"));
         end;
         tag "td" begin
-          Wserver.wprint "<input type=radio name=t value=C> - %s\n"
+          Wserver.wprint "<input type=radio name=t value=N> %s<br>\n"
+            (capitale (transl conf "families with encoding"));
+          Wserver.wprint "<input type=radio name=t value=G> - %s<br>\n"
+            (capitale (transl conf "index of the descendants"));
+          Wserver.wprint "<input type=radio name=t value=C> - %s<br>\n"
             (capitale (transl conf "index of the spouses (non descendants)"));
         end;
       end;
