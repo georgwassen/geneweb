@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.4 2000-03-22 10:51:18 ddr Exp $
+# $Id: geneweb.spec,v 3.4.2.1 2000-04-08 22:05:58 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -176,6 +176,10 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %defattr(-,geneweb,geneweb)
 %attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwd
 %attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwsetup
+%attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwc
+%attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwu
+%attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/ged2gwb
+%attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwb2ged
 %attr(755, root, root) /etc/rc.d/init.d/gwd
 %attr(755, root, root) /etc/rc.d/rc0.d/K01gwd
 %attr(755, root, root) /etc/rc.d/rc1.d/K01gwd
@@ -278,10 +282,6 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/etc/redirect.txt
 /home/geneweb/gw/gw/etc/renamed.txt
 /home/geneweb/gw/gw/etc/robot.txt
-/home/geneweb/gw/gw/ged2gwb
-/home/geneweb/gw/gw/gwb2ged
-/home/geneweb/gw/gw/gwc
-/home/geneweb/gw/gw/gwu
 /home/geneweb/gw/gw/images/gwback.jpg
 /home/geneweb/gw/gw/images/gwlogo.gif
 /home/geneweb/gw/gw/images/l-cn.jpg
@@ -575,6 +575,11 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %doc doc/*
 
 %changelog
+* Sun Apr  9 2000 Daniel de Rauglaudre
+Version 3.03-2
+- added set user id bit also for gwc gwu ged2gwb gwb2ged because were not
+  launched as geneweb user (seemed to depend on the Linux version)
+
 * Tue Dec  7 1999 Daniel de Rauglaudre
 Version 3.01
 - updated the file list
