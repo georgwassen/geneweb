@@ -1,11 +1,11 @@
-# $Id: Makefile,v 2.4.2.2 1999-04-09 06:42:36 ddr Exp $
+# $Id: Makefile,v 2.4.2.3 1999-04-09 14:09:25 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../wserver
 GWC_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo check.cmo pqueue.cmo consang.cmo gwcomp.cmo gwc.cmo
 CONSANG_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo mk_consang.cmo
-GWD_OBJS=../wserver/wserver.cmo argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo util.cmo date.cmo srcfile.cmo pXML.cmo eval.cmo global.cmo evalTempl.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo sendImage.cmo relation.cmo relationLink.cmo ascend.cmo descend.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthday.cmo birthDeath.cmo title.cmo family.cmo base64.cmo gwd.cmo
+GWD_OBJS=../wserver/wserver.cmo argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo util.cmo date.cmo srcfile.cmo pXML.cmo eval.cmo global.cmo evalSheet.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo sendImage.cmo relation.cmo relationLink.cmo ascend.cmo descend.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthday.cmo birthDeath.cmo title.cmo family.cmo base64.cmo gwd.cmo
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo select.cmo gwu.cmo
 all:: out
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
@@ -70,7 +70,7 @@ i18n: pr_transl.cmo always
 
 always:
 
-depend:
+depend: pa_lock.cmo pa_html.cmo def.syn.cmo q_codes.cmo
 	../tools/camlp4_depend.sh $(OCAMLI) *.ml* > .depend.new
 	mv .depend.new .depend
 

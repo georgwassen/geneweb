@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: global.ml,v 1.1.2.2 1999-04-09 08:34:57 ddr Exp $ *)
+(* $Id: global.ml,v 1.1.2.3 1999-04-09 14:09:27 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -16,12 +16,6 @@ value table =
            (fun p -> Util.acces conf base p :
             person -> string),
        <:ctyp< person -> string >>));
-     ("age",
-      (fun conf base ->
-         Obj.repr
-           (fun d -> temps_ecoule d conf.today :
-            date -> date),
-       <:ctyp< date -> date >>));
      ("aliases",
       (fun conf base ->
          Obj.repr
@@ -75,6 +69,18 @@ value table =
       (fun conf base ->
          Obj.repr
            (fun p -> Util.coa conf (sou base p.birth_place) :
+            person -> string),
+       <:ctyp< person -> string >>));
+     ("burial",
+      (fun conf base ->
+         Obj.repr
+           (fun p -> p.burial :
+            person -> burial),
+       <:ctyp< person -> burial >>));
+     ("burial_place",
+      (fun conf base ->
+         Obj.repr
+           (fun p -> Util.coa conf (sou base p.burial_place) :
             person -> string),
        <:ctyp< person -> string >>));
      ("children",
@@ -240,6 +246,12 @@ value table =
               int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)) :
             string -> int),
        <:ctyp< string -> int >>));
+     ("month",
+      (fun conf base ->
+         Obj.repr
+           (fun d -> d.month :
+            date -> int),
+       <:ctyp< date -> int >>));
      ("mother",
       (fun conf base ->
          Obj.repr
@@ -279,12 +291,25 @@ value table =
               | None -> None ] :
             person -> option family),
        <:ctyp< person -> option family >>));
+     ("passed_time",
+      (fun conf base ->
+         Obj.repr
+           (fun d1 d2 ->
+              let a = temps_ecoule d1 d2 in (a.day, a.month, a.year) :
+            date -> date -> (int * int * int)),
+       <:ctyp< date -> date -> (int * int * int) >>));
      ("person_text",
       (fun conf base ->
          Obj.repr
            (Util.person_text conf base :
             person -> string),
        <:ctyp< person -> string >>));
+     ("precision",
+      (fun conf base ->
+         Obj.repr
+           (fun d -> d.prec :
+            date -> precision),
+       <:ctyp< date -> precision >>));
      ("public_name",
       (fun conf base ->
          Obj.repr
@@ -370,6 +395,12 @@ value table =
            (fun p -> p.titles :
             person -> list title),
        <:ctyp< person -> list title >>));
+     ("today",
+      (fun conf base ->
+         Obj.repr
+           (conf.today :
+            date),
+       <:ctyp< date >>));
      ("transl",
       (fun conf base ->
          Obj.repr
@@ -417,6 +448,10 @@ value table =
               | _ -> s ] :
            date -> string),
        <:ctyp< date -> string >>));
+     ("+",
+      (fun conf base ->
+         Obj.repr (fun x y -> x + y : int -> int -> int),
+       <:ctyp< int -> int -> int >>));
      ("-",
       (fun conf base ->
          Obj.repr (fun x y -> x - y : int -> int -> int),

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: eval.ml,v 1.1.2.3 1999-04-09 08:34:56 ddr Exp $ *)
+(* $Id: eval.ml,v 1.1.2.4 1999-04-09 14:09:26 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -52,7 +52,7 @@ and print_type2 f =
 ;
 
 value error s err t =
-  do Printf.eprintf "*** while evaluating template\n";
+  do Printf.eprintf "*** while evaluating style sheet\n";
      Printf.eprintf "input: %s\n" s;
      Printf.eprintf "message: %s\n" err;
      match t with
@@ -84,7 +84,8 @@ GEXTEND G
       | e1 = expr; "="; e2 = expr -> <:expr< $e1$ = $e2$ >>
       | e1 = expr; ">"; e2 = expr -> <:expr< $e1$ > $e2$ >>
       | e1 = expr; "GT"; e2 = expr -> <:expr< $e1$ > $e2$ >> ]
-    | [ e1 = expr; "-"; e2 = expr -> <:expr< $e1$ - $e2$ >>
+    | [ e1 = expr; "+"; e2 = expr -> <:expr< $e1$ + $e2$ >>
+      | e1 = expr; "-"; e2 = expr -> <:expr< $e1$ - $e2$ >>
       | e1 = expr; "^"; e2 = expr -> <:expr< $e1$ ^ $e2$ >> ]
     | [ e1 = expr; e2 = expr -> <:expr< $e1$ $e2$ >> ]
     | "simple"
@@ -250,8 +251,8 @@ value eval_expr global env =
         let v = Obj.repr (Array.of_list (List.rev vl)) in
         let t = <:ctyp< ($list:List.rev tl$) >> in
         {cval = v; ctyp = t}
+    | <:expr< Sure >> -> {cval = Obj.repr Sure; ctyp = <:ctyp< precision >>}
     | <:expr< $str:s$ >> -> {cval = Obj.repr s; ctyp = <:ctyp< string >>}
-    | <:expr< $uid:s$ >> -> {cval = Obj.repr s; ctyp = <:ctyp< string >>}
     | <:expr< $int:s$ >> ->
         {cval = Obj.repr (int_of_string s); ctyp = <:ctyp< int >>}
     | e -> not_impl "eval_expr" e ]
@@ -355,7 +356,7 @@ value eval_matching global env d (p, w) =
 value wrap s f =
   try f () with
   [ Stdpp.Exc_located loc (Stream.Error err) ->
-      do Printf.eprintf "*** Error while parsing template\n";
+      do Printf.eprintf "*** Error while parsing style sheet\n";
          Printf.eprintf "input: %s\n" s;
          Printf.eprintf "at location: (%d, %d)\n" (fst loc) (snd loc);
          Printf.eprintf "message: %s\n" err;

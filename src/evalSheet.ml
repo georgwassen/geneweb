@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: evalSheet.ml,v 1.1.2.5 1999-04-09 06:42:36 ddr Exp $ *)
+(* $Id: evalSheet.ml,v 1.1.2.6 1999-04-09 14:09:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -309,7 +309,7 @@ and eval_match conf global env pend_nl exp =
 
 value f conf base env fname =
   let fname =
-    List.fold_right Filename.concat [Util.lang_dir.val; "templ"]
+    List.fold_right Filename.concat [Util.lang_dir.val; "sheet"]
       (fname ^ ".txt")
   in
   try
