@@ -1,4 +1,4 @@
-<comm e="$Id: perso.txt,v 1.1.2.2 1999-04-08 21:18:21 ddr Exp $">
+<comm e="$Id: perso.txt,v 1.1.2.3 1999-04-09 05:00:12 ddr Exp $">
 <comm e="Copyright (c) 1999 INRIA">
 <comm
   Context:
@@ -10,9 +10,9 @@
   <meta name="ROBOTS" content="NONE">
   <title>
     <match (public_name p, qualifiers p)>
-    <case (n, [nn :: _]) when n != ""><eval n> <eval nn>
-    <case (n, []) when n != ""><eval n> <eval surname p>
-    <case _><eval first_name p> <eval surname p>
+    <with (n, [nn :: _]) when n != ""><eval n> <eval nn>
+    <with (n, []) when n != ""><eval n> <eval surname p>
+    <with _><eval first_name p> <eval surname p>
     </match>
   </title>
 </head>
@@ -20,10 +20,10 @@
 
 <h1>
   <match (public_name p, qualifiers p)>
-  <case (n, [nn :: _]) when n != ""><eval n> <em><eval nn></em>
-  <case (n, []) when n != ""><eval n> <eval surname p>
-  <case (n, [nn :: _])><eval first_name p> <em><eval nn></em>
-  <case (_, [])>
+  <with (n, [nn :: _]) when n != ""><eval n> <em><eval nn></em>
+  <with (n, []) when n != ""><eval n> <eval surname p>
+  <with (n, [nn :: _])><eval first_name p> <em><eval nn></em>
+  <with (_, [])>
     <a href="`commd`m=P;v=`url_encode (lower (first_name p))`">
     <eval first_name p></a>
     <a href="`commd`m=N;v=`url_encode (lower (surname p))`">
@@ -34,16 +34,16 @@
 <p>
 
 <match find_person_in_env "z">
-<case Some d>
+<with Some d>
   <match find_sosa p d>
-  <case Some n>
+  <with Some n>
     <em>Sosa:
     <a href="`commd`m=RL;i1=`index p`;i2=`index d`;b1=1;b2=`n`">
     <eval string_of_num n></a>
     </em><p>
-  <case None>
+  <with None>
   </match>
-<case None>
+<with None>
 </match>
 
 <if is_rtl>
@@ -58,21 +58,21 @@
 
 <if auth p>
   <match image p>
-  <case "">
+  <with "">
     <match auto_image_file p>
-    <case Some f>
+    <with Some f>
       <match image_size f>
-      <case Some (width, height)>
+      <with Some (width, height)>
         <img src="`commd`m=IM;v=`url_encode (basename f)`;d=`modtime f`"
          width=`width` height=`height` alt="`transl \"image\"`">
-      <case None>
+      <with None>
         <img src="`commd`m=IM;v=`url_encode (basename f)`;d=`modtime f`"
          alt="`transl \"image\"`">
       </match>
       <p>
-    <case None>
+    <with None>
     </match>
-  <case s>
+  <with s>
     <if string_length s GT string_length "http://" AND
         string_sub s 0 (string_length "http://") = "http://">
       <img src=s alt="`transl \"image\"`">
@@ -80,16 +80,16 @@
     <else>
       <if is_implicit_filename s>
         <match image_file_name s>
-        <case Some fname>
+        <with Some fname>
            <match image_size fname>
-           <case Some (width, height)>
+           <with Some (width, height)>
              <img src="`commd`m=IM;v=`s`" width=`width` height=`height`
               alt="`transl \"image\"`">
-           <case None>
+           <with None>
              <img src="`commd`m=IM;v=`s`" alt="`transl \"image\"`">
            </match>
            <p>
-        <case None>
+        <with None>
         </match>
       </if>
     </if>
@@ -97,11 +97,11 @@
 </if>
 
 <match (public_name p, qualifiers p)>
-<case (n, [_ :: nnl]) when n != "">
+<with (n, [_ :: nnl]) when n != "">
   <for nn in nnl>
     <eval n> <em><eval nn></em><br>
   </for>
-<case (_, [_ :: nnl])>
+<with (_, [_ :: nnl])>
   <for nn in nnl>
     <eval first_name p> <em><eval nn></em><br>
   </for>
@@ -116,8 +116,8 @@
 </if>
 
 <match (public_name p, qualifiers p)>
-<case ("", [])>
-<case _>
+<with ("", [])>
+<with _>
   <em>
   (<a href="`commd`m=P;v=`url_encode (lower (first_name p))`"><eval
     first_name p></a>
@@ -132,51 +132,51 @@
 <for n in first_names_aliases p><em>(<eval n>...)</em><br></for>
 
 <match (public_name p, qualifiers p, aliases p, has_titles p)>
-<case ("", [], _, _)><p>
-<case (_, _, [_ :: _], _)><p>
-<case (_, _, _, True)><p>
+<with ("", [], _, _)><p>
+<with (_, _, [_ :: _], _)><p>
+<with (_, _, _, True)><p>
 </match>
 
 <if auth p>
   <match occupation p>
-  <case "">
-  <case s><em><eval s></em><br>
+  <with "">
+  <with s><em><eval s></em><br>
   </match>
 </if>
 
 <if auth p>
   <match (birth_date p, birth_place p)>
-  <case (None, "")>
-  <case _><em><eval transl_nth "Born" (sex p)>
+  <with (None, "")>
+  <with _><em><eval transl_nth "Born" (sex p)>
   </match>
   <match birth_date p>
-  <case Some d>
+  <with Some d>
     <eval ondate d><strip>
     <if is_anniversary d>
       <match death p>
-      <case NotDead> (<eval transl "happy birthday to you!">)
+      <with NotDead> (<eval transl "happy birthday to you!">)
       </match>
     </if>
   </match><strip>
   <match birth_place p>
-  <case "">
-  <case s> - <eval s>
+  <with "">
+  <with s> - <eval s>
   </match><strip>
   <match (birth_date p, birth_place p)>
-  <case (None, "")>
-  <case _>.</em><br>
+  <with (None, "")>
+  <with _>.</em><br>
   </match>
 </if>
 
 <if auth p>
   <match (baptism_date p, baptism_place p)>
-  <case (Some d, "")>
+  <with (Some d, "")>
     <em><eval transl_nth "Baptized" (sex p)> <eval ondate d>.</em><br>
-  <case (Some d, s)>
+  <with (Some d, s)>
     <em><eval transl_nth "Baptized" (sex p)> <eval ondate d>
     - <eval s>.</em><br>
-  <case (None, "")>
-  <case (None, s)>
+  <with (None, "")>
+  <with (None, s)>
     <em><eval transl_nth "Baptized" (sex p)> - <eval s>.</em><br>
   </match>
 </if>
@@ -185,7 +185,7 @@
 <em>Consanguinity to display...</em><br>
 
 <match parents p>
-<case Some fam>
+<with Some fam>
   <p>
   <h3><eval transl "Parents"></h3>
   <ul>
@@ -193,19 +193,19 @@
     <li>
       <a href="`commd``access p`">
       <match main_title p>
-      <case Some t when not (is_private_access p)>
+      <with Some t when not (is_private_access p)>
         <eval titled_person_text p t></a>,
         <em><eval title_ident t> <eval title_place t></em>
-      <case _><eval person_text p></a>
+      <with _><eval person_text p></a>
       </match>
       <if auth p>
         <match (birth_date p, death p)>
-        <case (Some bd, NotDead)><em><eval year_p bd>-</em>
-        <case (Some bd, Death _ dd)><em><eval year_p bd>-<eval year_p dd></em>
-        <case (Some bd, DeadYoung)><em><eval year_p bd>+</em>
-        <case (Some bd, DeadDontKnowWhen)><em><eval year_p bd>+</em>
-        <case (Some bd, DontKnowIfDead)><em>*<eval year_p bd></em>
-        <case (_, Death _ dd)><em>+<eval year_p dd></em>
+        <with (Some bd, NotDead)><em><eval year_p bd>-</em>
+        <with (Some bd, Death _ dd)><em><eval year_p bd>-<eval year_p dd></em>
+        <with (Some bd, DeadYoung)><em><eval year_p bd>+</em>
+        <with (Some bd, DeadDontKnowWhen)><em><eval year_p bd>+</em>
+        <with (Some bd, DontKnowIfDead)><em>*<eval year_p bd></em>
+        <with (_, Death _ dd)><em>+<eval year_p dd></em>
         </match>
       </if>
   </for>
@@ -214,8 +214,8 @@
 </match>
 
 <match families p>
-<case []>
-<case faml>
+<with []>
+<with faml>
   <h3><eval transl_nth "Marriage/marriages" 1>
   <eval transl "and"> <eval transl_nth "child/children" 1></h3>
   <ul>
@@ -227,29 +227,29 @@
       <format (transl_nth "Married%t to" (sex p))>
         <if auth p AND auth (spouse p fam)>
           <match (marriage_date fam, marriage_place fam)>
-          <case (None, "")>
-          <case (None, s)>, <em><eval s></em>,
-          <case (Some d, "")> <em><eval ondate d></em>
-          <case (Some d, s)> <em><eval ondate d>, <eval s></em>,
+          <with (None, "")>
+          <with (None, s)>, <em><eval s></em>,
+          <with (Some d, "")> <em><eval ondate d></em>
+          <with (Some d, s)> <em><eval ondate d>, <eval s></em>,
           </match>
         </if>
     </if>
     <for p in [spouse p fam]>
       <a href="`commd``access p`">
       <match main_title p>
-      <case Some t when not (is_private_access p)>
+      <with Some t when not (is_private_access p)>
         <eval titled_person_text p t></a>,
         <em><eval title_ident t> <eval title_place t></em>
-      <case _><eval person_text p></a>
+      <with _><eval person_text p></a>
       </match>
       <if auth p>
         <match (birth_date p, death p)>
-        <case (Some bd, NotDead)> <em><eval year_p bd>-</em>
-        <case (Some bd, Death _ dd)> <em><eval year_p bd>-<eval year_p dd></em>
-        <case (Some bd, DeadYoung)> <em><eval year_p bd>+</em>
-        <case (Some bd, DeadDontKnowWhen)> <em><eval year_p bd>+</em>
-        <case (Some bd, DontKnowIfDead)> <em>*<eval year_p bd></em>
-        <case (_, Death _ dd)> <em>+<eval year_p dd></em>
+        <with (Some bd, NotDead)> <em><eval year_p bd>-</em>
+        <with (Some bd, Death _ dd)> <em><eval year_p bd>-<eval year_p dd></em>
+        <with (Some bd, DeadYoung)> <em><eval year_p bd>+</em>
+        <with (Some bd, DeadDontKnowWhen)> <em><eval year_p bd>+</em>
+        <with (Some bd, DontKnowIfDead)> <em>*<eval year_p bd></em>
+        <with (_, Death _ dd)> <em>+<eval year_p dd></em>
         </match>
       </if>
     </for><strip>
@@ -268,13 +268,13 @@
         </if>
         <if auth p>
           <match (birth_date c, death c)>
-          <case (Some bd, NotDead)><em><eval year_p bd>-</em>
-          <case (Some bd, Death _ dd)>
+          <with (Some bd, NotDead)><em><eval year_p bd>-</em>
+          <with (Some bd, Death _ dd)>
             <em><eval year_p bd>-<eval year_p dd></em>
-          <case (Some bd, DeadYoung)><em><eval year_p bd>+</em>
-          <case (Some bd, DeadDontKnowWhen)><em><eval year_p bd>+</em>
-          <case (Some bd, DontKnowIfDead)><em>*<eval year_p bd></em>
-          <case (_, Death _ dd)><em>+<eval year_p dd></em>
+          <with (Some bd, DeadYoung)><em><eval year_p bd>+</em>
+          <with (Some bd, DeadDontKnowWhen)><em><eval year_p bd>+</em>
+          <with (Some bd, DontKnowIfDead)><em>*<eval year_p bd></em>
+          <with (_, Death _ dd)><em>+<eval year_p dd></em>
           </match>
         </if>
       </for>

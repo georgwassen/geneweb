@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: evalSheet.ml,v 1.1.2.2 1999-04-08 21:18:23 ddr Exp $ *)
+(* $Id: evalSheet.ml,v 1.1.2.3 1999-04-09 05:00:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -15,7 +15,7 @@ type statement =
 
 value stop_match_case =
   fun
-  [ PXML.Xtag "case" [(_, _)] | PXML.Xetag "match" -> True
+  [ PXML.Xtag "with" [(_, _)] | PXML.Xetag "match" -> True
   | _ -> False ]
 ;
 
@@ -58,7 +58,7 @@ and make_if xast =
   | _ -> None ]
 and make_match cases =
   fun
-  [ [PXML.Xtag "case" [(_, p)] :: xast] -> make_match_case cases p xast
+  [ [PXML.Xtag "with" [(_, p)] :: xast] -> make_match_case cases p xast
   | [PXML.Xetag "match" :: xast] -> Some (List.rev cases, xast)
   | [PXML.Xtext _ | PXML.Xind _ :: xast] -> make_match cases xast
   | _ -> None ]
