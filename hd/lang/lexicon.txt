@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.14 1999-04-07 11:33:42 ddr Exp $
+# $Id: lexicon.txt,v 2.14.2.1 1999-04-11 01:19:12 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2308,7 +2308,7 @@ fr: de/d'
 he:    של
 it: di/d'
 nl: van
-no: av
+no: til
 pt: de
 se: till
 
@@ -2323,7 +2323,7 @@ no: fra %ts slektside
 pt: pelo lado de %t
 se: fr&aring;n %ts sl&auml;ktsida
 
-    of (person of lower generation level)
+    of (same or greater generation level)
 de: von +decl
 en: of
 eo: de
@@ -2332,7 +2332,7 @@ fr: de/d'
 he:    של
 it: di/d'
 nl: van
-no: til
+no: av
 pt: de
 se: till
 
@@ -2358,7 +2358,7 @@ fr: de la naissance
 he:   של הלידה
 it: di nascita
 nl: van de geboorte
-no: av f&oslash;dselen
+no: for f&oslash;dselen
 pt: do nascimento
 se: av f&ouml;delsen
 

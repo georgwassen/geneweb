@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: pXML.ml,v 1.1.2.3 1999-04-10 06:40:47 ddr Exp $ *)
+(* $Id: pXML.ml,v 1.1.2.4 1999-04-11 01:19:14 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type xast =
@@ -67,29 +67,27 @@ value rec text len =
   | [: :] -> len ]
 ;
 
-value rec elem ind strm =
-  match ind with
-  [ Some cnt ->
-      match strm with parser
-      [ [: `' ' :] -> elem (Some (cnt + 1)) strm
-      | [: :] -> (Xind cnt, None) ]
-  | None ->
-      match strm with parser
-      [ [: `'<'; t = tag?"tag expected"; `'>'?"'>' expected" :] -> (t, None)
-      | [: `'\n' :] -> elem (Some 0) strm
-      | [: `x; len = text (store 0 x) :] -> (Xtext (get_buff len), None) ] ]
+value rec indent i =
+  parser
+  [ [: `' '; strm :] -> indent (i + 1) strm
+  | [: :] -> Xind i ]
 ;
 
-value wrap strm =
-  loop [] (Some 0) strm where rec loop r ind =
-    parser
-    [ [: (a, ind) = elem ind :] -> loop [a :: r] ind strm
-    | [: `_ :] -> raise (Stream.Error "xml")
-    | [: :] -> List.rev r ]
+value next_token =
+  parser
+  [ [: `'\n'; t = indent 0 :] -> t
+  | [: `'<'; t = tag?"tag expected"; `'>'?"'>' expected" :] -> t
+  | [: `x; len = text (store 0 x) :] -> Xtext (get_buff len) ]
+;
+
+value rec wrap tl =
+  parser
+  [ [: t = next_token; strm :] -> wrap [t :: tl] strm
+  | [: :] -> List.rev tl ]
 ;
 
 value f strm =
-  try wrap strm with e ->
+  try wrap [indent 0 strm] strm with e ->
     let pos = Stream.count strm in
     Stdpp.raise_with_loc (pos, pos + 1) e
 ;

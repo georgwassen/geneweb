@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: evalSheet.ml,v 1.1.2.7 1999-04-10 06:40:47 ddr Exp $ *)
+(* $Id: evalSheet.ml,v 1.1.2.8 1999-04-11 01:19:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -321,10 +321,10 @@ and eval_match conf global env pend_nl exp =
 value f conf base env fname =
   let fname =
     List.fold_right Filename.concat [Util.lang_dir.val; "sheet"]
-      (fname ^ ".txt")
+     (fname ^ ".txt")
   in
-  do Util.html conf; return
   try
+    do Util.html conf; return
     let xast =
       let ic = open_in fname in
       let r = PXML.f (Stream.of_channel ic) in
@@ -338,6 +338,11 @@ value f conf base env fname =
     let pend_nl = eval_sequence conf global env [] seq in flush_nl pend_nl
   with
   [ Exit -> ()
+  | Sys_error err ->
+      do Printf.eprintf "*** Error while interpreting file \"%s\"\n" fname;
+         Printf.eprintf "message: \"%s\"\n" err;
+         flush stderr;
+      return ()
   | Stdpp.Exc_located loc (Stream.Error err) ->
       do Printf.eprintf "*** Error while parsing file \"%s\"\n" fname;
          Printf.eprintf "at location: (%d, %d)\n" (fst loc) (snd loc);

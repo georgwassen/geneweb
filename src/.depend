@@ -40,29 +40,29 @@ descend.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx util.cmx \
     ../wserver/wserver.cmx 
 eval.cmo: adef.cmi def.cmi 
 eval.cmx: adef.cmx def.cmi 
-evalSheet.cmo: eval.cmo global.cmo num.cmi pXML.cmo util.cmi \
+evalSheet.cmo: config.cmi eval.cmo global.cmo num.cmi pXML.cmo util.cmi \
     ../wserver/wserver.cmi 
-evalSheet.cmx: eval.cmx global.cmx num.cmx pXML.cmx util.cmx \
+evalSheet.cmx: config.cmi eval.cmx global.cmx num.cmx pXML.cmx util.cmx \
     ../wserver/wserver.cmx 
 family.cmo: adef.cmi advSearchOk.cmo alln.cmo ansel.cmo ascend.cmo \
     birthDeath.cmo birthday.cmo config.cmi cousins.cmo date.cmi def.cmi \
     descend.cmo gutil.cmi merge.cmi mergeFam.cmo mergeFamOk.cmo mergeInd.cmo \
-    mergeIndOk.cmo name.cmi perso.cmi relation.cmo relationLink.cmo \
-    sendImage.cmo some.cmo srcfile.cmi title.cmo update.cmi updateFam.cmi \
-    updateFamOk.cmo updateInd.cmi updateIndOk.cmi util.cmi \
-    ../wserver/wserver.cmi family.cmi 
+    mergeIndOk.cmo name.cmi relationLink.cmo sendImage.cmo sheet.cmo some.cmo \
+    srcfile.cmi title.cmo update.cmi updateFam.cmi updateFamOk.cmo \
+    updateInd.cmi updateIndOk.cmi util.cmi ../wserver/wserver.cmi family.cmi 
 family.cmx: adef.cmx advSearchOk.cmx alln.cmx ansel.cmx ascend.cmx \
     birthDeath.cmx birthday.cmx config.cmi cousins.cmx date.cmx def.cmi \
     descend.cmx gutil.cmx merge.cmx mergeFam.cmx mergeFamOk.cmx mergeInd.cmx \
-    mergeIndOk.cmx name.cmx perso.cmx relation.cmx relationLink.cmx \
-    sendImage.cmx some.cmx srcfile.cmx title.cmx update.cmx updateFam.cmx \
-    updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx \
-    ../wserver/wserver.cmx family.cmi 
+    mergeIndOk.cmx name.cmx relationLink.cmx sendImage.cmx sheet.cmx some.cmx \
+    srcfile.cmx title.cmx update.cmx updateFam.cmx updateFamOk.cmx \
+    updateInd.cmx updateIndOk.cmx util.cmx ../wserver/wserver.cmx family.cmi 
 family.cmi: config.cmi def.cmi 
-global.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi num.cmi \
-    util.cmi 
-global.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx num.cmx \
-    util.cmx 
+globDef.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi num.cmi \
+    perso.cmi util.cmi ../wserver/wserver.cmi 
+globDef.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx num.cmx \
+    perso.cmx util.cmx ../wserver/wserver.cmx 
+global.cmo: config.cmi def.cmi globDef.cmo gutil.cmi num.cmi 
+global.cmx: config.cmi def.cmi globDef.cmx gutil.cmx num.cmx 
 gutil.cmo: adef.cmi ansel.cmo def.cmi name.cmi gutil.cmi 
 gutil.cmx: adef.cmx ansel.cmx def.cmi name.cmx gutil.cmi 
 gutil.cmi: def.cmi 
@@ -116,21 +116,21 @@ name.cmo: name.cmi
 name.cmx: name.cmi 
 num.cmo: num.cmi 
 num.cmx: num.cmi 
-perso.cmo: adef.cmi config.cmi date.cmi def.cmi eval.cmo evalSheet.cmo \
-    global.cmo gutil.cmi name.cmi num.cmi util.cmi ../wserver/wserver.cmi \
-    perso.cmi 
-perso.cmx: adef.cmx config.cmi date.cmx def.cmi eval.cmx evalSheet.cmx \
-    global.cmx gutil.cmx name.cmx num.cmx util.cmx ../wserver/wserver.cmx \
-    perso.cmi 
-perso.cmi: config.cmi def.cmi 
+pa_sheet.cmo: eval.cmo pXML.cmo 
+pa_sheet.cmx: eval.cmx pXML.cmx 
+perso.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi num.cmi \
+    util.cmi ../wserver/wserver.cmi perso.cmi 
+perso.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx num.cmx \
+    util.cmx ../wserver/wserver.cmx perso.cmi 
+perso.cmi: config.cmi def.cmi num.cmi 
 phonygwd.cmo: argl.cmo ../wserver/wserver.cmi 
 phonygwd.cmx: argl.cmx ../wserver/wserver.cmx 
 pqueue.cmo: pqueue.cmi 
 pqueue.cmx: pqueue.cmi 
-relation.cmo: adef.cmi config.cmi consang.cmi def.cmi eval.cmo evalSheet.cmo \
-    gutil.cmi num.cmi srcfile.cmi util.cmi ../wserver/wserver.cmi 
-relation.cmx: adef.cmx config.cmi consang.cmx def.cmi eval.cmx evalSheet.cmx \
-    gutil.cmx num.cmx srcfile.cmx util.cmx ../wserver/wserver.cmx 
+relation.cmo: adef.cmi config.cmi consang.cmi def.cmi gutil.cmi num.cmi \
+    srcfile.cmi util.cmi ../wserver/wserver.cmi 
+relation.cmx: adef.cmx config.cmi consang.cmx def.cmi gutil.cmx num.cmx \
+    srcfile.cmx util.cmx ../wserver/wserver.cmx 
 relationLink.cmo: adef.cmi config.cmi consang.cmi date.cmi def.cmi gutil.cmi \
     num.cmi pqueue.cmi util.cmi ../wserver/wserver.cmi 
 relationLink.cmx: adef.cmx config.cmi consang.cmx date.cmx def.cmi gutil.cmx \
@@ -141,6 +141,10 @@ sendImage.cmo: adef.cmi config.cmi def.cmi gutil.cmi iobase.cmi lock.cmo \
     srcfile.cmi update.cmi util.cmi ../wserver/wserver.cmi 
 sendImage.cmx: adef.cmx config.cmi def.cmi gutil.cmx iobase.cmx lock.cmx \
     srcfile.cmx update.cmx util.cmx ../wserver/wserver.cmx 
+sheet.cmo: consang.cmi def.cmi eval.cmo evalSheet.cmo num.cmi perso.cmi \
+    relation.cmo 
+sheet.cmx: consang.cmx def.cmi eval.cmx evalSheet.cmx num.cmx perso.cmx \
+    relation.cmx 
 some.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
     ../wserver/wserver.cmi 
 some.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
@@ -154,6 +158,8 @@ title.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
     ../wserver/wserver.cmi 
 title.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
     ../wserver/wserver.cmx 
+toto.cmo: globDef.cmo 
+toto.cmx: globDef.cmx 
 update.cmo: adef.cmi ansel.cmo config.cmi date.cmi def.cmi gutil.cmi \
     iovalue.cmi name.cmi util.cmi ../wserver/wserver.cmi update.cmi 
 update.cmx: adef.cmx ansel.cmx config.cmi date.cmx def.cmi gutil.cmx \

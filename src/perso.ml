@@ -1,5 +1,5 @@
-(* camlp4r ./pa_html.cmo q_MLast.cmo *)
-(* $Id: perso.ml,v 2.15.2.5 1999-04-09 14:09:30 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo *)
+(* $Id: perso.ml,v 2.15.2.6 1999-04-11 01:19:14 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -21,7 +21,7 @@ value copy_string_with_macros conf s =
 ;
 
 exception Ok;
-value grand_parent_connu base a =
+value has_grand_parents base p =
   let rec loop niveau a =
     if niveau = 2 then raise Ok
     else
@@ -34,10 +34,10 @@ value grand_parent_connu base a =
           return ()
       | _ -> () ]
   in
-  try do loop 0 a; return False with [ Ok -> True ]
+  try do loop 0 (aoi base p.cle_index); return False with [ Ok -> True ]
 ;
 
-value a_des_petits_enfants base p =
+value has_grand_children base p =
   try
     do Array.iter
          (fun fi ->
@@ -88,7 +88,7 @@ value next_sibling base p a =
 ;
 
 value
-  print_title conf base and_txt p a first (nth, name, title, places, dates) =
+  print_title conf base and_txt p first (nth, name, title, places, dates) =
   do Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">\n" (commd conf)
        (code_varenv (sou base title))
        (code_varenv (sou base (List.hd places)));
@@ -164,7 +164,7 @@ value name_equiv n1 n2 =
   n1 = n2 || n1 = Tmain && n2 = Tnone || n1 = Tnone && n2 = Tmain
 ;
 
-value print_titles conf base and_txt p a =
+value print_titles conf base and_txt p =
   let titles = p.titles in
   let titles =
     List.fold_right
@@ -204,7 +204,7 @@ value print_titles conf base and_txt p a =
       (fun first t ->
          do if not first then Wserver.wprint "," else ();
             Wserver.wprint "\n";
-            print_title conf base and_txt p a first t;
+            print_title conf base and_txt p first t;
          return False)
       True titles
   in
@@ -582,7 +582,7 @@ value print_sources conf base p =
 (* Version matching the Sosa number of the "ancestor" pages *)
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
-value find_sosa conf base a p =
+value find_sosa_aux conf base a p =
   let tstab = Util.create_topological_sort conf base in
   let mark = Array.create base.data.persons.len False in
   let rec gene_find =
@@ -615,7 +615,7 @@ value find_sosa conf base a p =
     | Right z -> Some z ]
 ;
 (* Male version
-value find_sosa conf base a p =
+value find_sosa_aux conf base a p =
   let mark = Array.create base.data.persons.len False in
   let rec find z ip =
     if ip = a.cle_index then Some z
@@ -636,7 +636,7 @@ value find_sosa conf base a p =
 ;
 *)
 
-value find_sosa_optim conf base a p =
+value find_sosa conf base a p =
   if a.cle_index = p.cle_index then Some Num.one
   else
     let has_children =
@@ -646,12 +646,12 @@ value find_sosa_optim conf base a p =
            Array.length fam.children > 0)
         (Array.to_list a.family)
     in
-    if has_children then find_sosa conf base a p
+    if has_children then find_sosa_aux conf base a p
     else None
 ;
 
 value print_sosa conf base a p =
-  match find_sosa_optim conf base a p with
+  match find_sosa conf base a p with
   [ Some n ->
       do Wserver.wprint "<em>Sosa:\n";
          stag "a" "href=\"%sm=RL;i1=%d;i2=%d;b1=1;b2=%s\""
@@ -678,7 +678,7 @@ value print_ancestors_descends_cousins conf base p a =
     if not things then Wserver.wprint "\n<h4>" else Wserver.wprint " / "
   in
   let things = False in
-  let has_grand_parents = grand_parent_connu base a in
+  let has_grand_parents = has_grand_parents base p in
   let things =
     if has_grand_parents then
       do head things;
@@ -689,7 +689,7 @@ value print_ancestors_descends_cousins conf base p a =
      else things
   in
   let things =
-    if a_des_petits_enfants base p then
+    if has_grand_children base p then
       do head things;
          Wserver.wprint "<a href=\"%s%s;m=D\">%s</a>"
            (commd conf) (acces conf base p)
@@ -737,45 +737,6 @@ value print_ancestors_descends_cousins conf base p a =
 
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
-value loc = (0, 0);
-
-Hashtbl.add Global.table
-  "has_grand_children"
-  (fun conf base ->
-     Obj.repr
-       (a_des_petits_enfants base :
-        person -> bool),
-   <:ctyp< person -> bool >>)
-;
-
-Hashtbl.add Global.table
-  "has_grand_parents"
-  (fun conf base ->
-     Obj.repr
-       (fun p -> grand_parent_connu base (aoi base p.cle_index) :
-        person -> bool),
-   <:ctyp< person -> bool >>)
-;
-
-Hashtbl.add Global.table
-  "find_sosa"
-  (fun conf base ->
-     Obj.repr
-       (find_sosa_optim conf base :
-        person -> person -> option Num.t),
-   <:ctyp< person -> person -> option num >>)
-;
-
-Hashtbl.add Global.table
-  "titles"
-  (fun conf base ->
-     Obj.repr
-       (fun p ->
-          print_titles conf base (transl conf "and") p (aoi base p.cle_index) :
-        person -> unit),
-   <:ctyp< person -> unit >>)
-;
-
 value print conf base p =
   let title h =
     match (sou base p.public_name, p.nick_names) with
@@ -816,13 +777,7 @@ value print conf base p =
           return () ]
   in
   let a = aoi base p.cle_index in
-  do let env =
-      [("p",
-        {Eval.cval = Obj.repr (p : person);
-         Eval.ctyp = <:ctyp< person >>})]
-     in
-     EvalSheet.f conf base env "perso";
-     header conf title;
+  do header conf title;
      print_sosa_if_any conf base p;
      print_link_to_welcome conf True;
      if age_autorise conf base p then
@@ -902,7 +857,7 @@ value print conf base p =
      if List.length p.titles > 0 &&
         (p.access <> Private || conf.friend || conf.wizard) then
        do Wserver.wprint "<em>";
-          print_titles conf base (transl conf "and") p a;
+          print_titles conf base (transl conf "and") p;
           Wserver.wprint ".</em>\n";
           html_br conf;
        return ()

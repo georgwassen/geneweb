@@ -1,8 +1,6 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: eval.ml,v 1.1.2.6 1999-04-10 06:40:47 ddr Exp $ *)
+(* $Id: eval.ml,v 1.1.2.7 1999-04-11 01:19:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
-
-open Def;
 
 type dyn = { cval : Obj.t; ctyp : MLast.ctyp };
 
@@ -252,7 +250,8 @@ value eval_expr global env =
         let v = Obj.repr (Array.of_list (List.rev vl)) in
         let t = <:ctyp< ($list:List.rev tl$) >> in
         {cval = v; ctyp = t}
-    | <:expr< Sure >> -> {cval = Obj.repr Sure; ctyp = <:ctyp< precision >>}
+    | <:expr< Sure >> ->
+        {cval = Obj.repr Adef.Sure; ctyp = <:ctyp< precision >>}
     | <:expr< $str:s$ >> -> {cval = Obj.repr s; ctyp = <:ctyp< string >>}
     | <:expr< $int:s$ >> ->
         {cval = Obj.repr (int_of_string s); ctyp = <:ctyp< int >>}
@@ -279,43 +278,43 @@ do Printf.eprintf "... binding %s\n" s; flush stderr; return
           | (envo, [], [], []) -> envo
           | _ -> None ]
     | (<:ctyp< death >>, p) ->
-        match ((Obj.magic v : death), p) with
-        [ (NotDead, <:patt< NotDead >>) -> Some []
-        | (Death dr dd, <:patt< Death $p1$ $p2$ >>) ->
+        match ((Obj.magic v : Def.death), p) with
+        [ (Def.NotDead, <:patt< NotDead >>) -> Some []
+        | (Def.Death dr dd, <:patt< Death $p1$ $p2$ >>) ->
             match
-              (matching (Obj.repr (dr : death_reason))
+              (matching (Obj.repr (dr : Def.death_reason))
                  (<:ctyp< death_reason >>, p1),
-               matching (Obj.repr (Adef.date_of_cdate dd : date))
+               matching (Obj.repr (Adef.date_of_cdate dd : Adef.date))
                  (<:ctyp< date >>, p2))
             with
             [ (Some env1, Some env2) -> Some (env1 @ env2)
             | _ -> None ]
-        | (DeadYoung, <:patt< DeadYoung >>) -> Some []
-        | (DeadDontKnowWhen, <:patt< DeadDontKnowWhen >>) -> Some []
-        | (DontKnowIfDead, <:patt< DontKnowIfDead >>) -> Some []
+        | (Def.DeadYoung, <:patt< DeadYoung >>) -> Some []
+        | (Def.DeadDontKnowWhen, <:patt< DeadDontKnowWhen >>) -> Some []
+        | (Def.DontKnowIfDead, <:patt< DontKnowIfDead >>) -> Some []
         | (_, <:patt< NotDead >> | <:patt< Death $_$ $_$ >>) -> None
         | (_, <:patt< DeadYoung >> | <:patt< DeadDontKnowWhen >>) -> None
         | (_, <:patt< DontKnowIfDead >>) -> None
         | _ -> eval_err "matching a death type with incompatible pattern" ]
     | (<:ctyp< death_reason >>, p) ->
-        match ((Obj.magic v : death_reason), p) with
-        [ (Unspecified, <:patt< Unspecified >>) -> Some []
-        | (Murdered, <:patt< Murdered >>) -> Some []
-        | (Killed, <:patt< Killed >>) -> Some []
-        | (Executed, <:patt< Executed >>) -> Some []
-        | (Disappeared, <:patt< Disappeared >>) -> Some []
+        match ((Obj.magic v : Def.death_reason), p) with
+        [ (Def.Unspecified, <:patt< Unspecified >>) -> Some []
+        | (Def.Murdered, <:patt< Murdered >>) -> Some []
+        | (Def.Killed, <:patt< Killed >>) -> Some []
+        | (Def.Executed, <:patt< Executed >>) -> Some []
+        | (Def.Disappeared, <:patt< Disappeared >>) -> Some []
         | (_, <:patt< Unspecified >> | <:patt< Murdered >>) -> None
         | (_, <:patt< Killed >> | <:patt< Executed >>) -> None
         | (_, <:patt< Disappeared >>) -> None
         | _ ->
             eval_err "matching a death_reason type with incompatible pattern" ]
     | (<:ctyp< burial >>, p) ->
-        match ((Obj.magic v : burial), p) with
-        [ (Buried d, <:patt< Buried $p$ >>) ->
-            matching (Obj.repr (Adef.od_of_codate d : option date))
+        match ((Obj.magic v : Def.burial), p) with
+        [ (Def.Buried d, <:patt< Buried $p$ >>) ->
+            matching (Obj.repr (Adef.od_of_codate d : option Adef.date))
               (<:ctyp< option date >>, p)
-        | (Cremated d, <:patt< Cremated $p$ >>) ->
-            matching (Obj.repr (Adef.od_of_codate d : option date))
+        | (Def.Cremated d, <:patt< Cremated $p$ >>) ->
+            matching (Obj.repr (Adef.od_of_codate d : option Adef.date))
               (<:ctyp< option date >>, p)
         | (_, <:patt< Buried $_$ >> | <:patt< Cremated $_$ >>) -> None
         | _ -> eval_err "matching a burial type with incompatible pattern" ]

@@ -1,5 +1,6 @@
-<comm e="$Id: perso.txt,v 1.1.2.7 1999-04-10 06:40:46 ddr Exp $">
-<comm e="Copyright (c) 1999 INRIA">
+<comm param = p>
+<comm $Id: s_perso.txt,v 1.1.2.1 1999-04-11 01:19:12 ddr Exp $>
+<comm Copyright (c) 1999 INRIA>
 <comm
   Context:
     p = person to be displayed
@@ -39,7 +40,7 @@
   <with Some n>
     <em>Sosa:
     <a href="`commd`m=RL;i1=`index p`;i2=`index d`;b1=1;b2=`n`">
-    <eval string_of_num n></a>
+    <eval string_of_num_sep n></a>
     </em><p>
   <with None>
   </match>
@@ -105,6 +106,7 @@
   <for nn in nnl>
     <eval first_name p> <em><eval nn></em><br>
   </for>
+<with _>
 </match>
 
 <for a in aliases p>
@@ -112,7 +114,7 @@
 </for>
 
 <if has_titles p AND not (is_private_access p)>
-  <em><eval titles p>.</em><br>
+  <em><eval print_titles p>.</em><br>
 </if>
 
 <match (public_name p, qualifiers p)>
@@ -135,6 +137,7 @@
 <with ("", [], _, _)><p>
 <with (_, _, [_ :: _], _)><p>
 <with (_, _, _, True)><p>
+<with _>
 </match>
 
 <if auth p>
@@ -155,8 +158,10 @@
     <if is_anniversary d>
       <match death p>
       <with NotDead> (<eval transl "happy birthday to you!">)
+      <with _>
       </match>
     </if>
+  <with None>
   </match><strip>
   <match birth_place p>
   <with "">
@@ -210,6 +215,7 @@
       <with None><em><eval transl_nth "Died" (sex p)>.</em><br>
       </match>
     </if>
+  <with _>
   </match>
 </if>
 
@@ -222,14 +228,15 @@
       <match (passed_time d today)>
       <with (0, 0, 0)><eval transl "birth">
       <with (1, 0, 0)><eval transl "one day old">
-      <with (d, 0, 0)><eval d> <eval transl "days old">
+      <with (d, 0, 0)><eval (string_of_int d)> <eval transl "days old">
       <with (_, 1, 0)><eval transl "one month old">
-      <with (_, m, 0)><eval m> <eval transl "months old">
+      <with (_, m, 0)><eval (string_of_int m)> <eval transl "months old">
       <with (_, 0, 1)><eval transl "one year old">
-      <with (_, m, 1)><eval (m + 12)> <eval transl "months old">
-      <with (_, _, y)><eval y> <eval transl "years old">
+      <with (_, m, 1)><eval (string_of_int (m+12))> <eval transl "months old">
+      <with (_, _, y)><eval (string_of_int y)> <eval transl "years old">
       </match>.</em><br>
     </if>
+  <with _>
   </match>
 </if>
 
@@ -241,14 +248,15 @@
       <match (passed_time d1 d2)>
       <with (0, 0, 0)><eval transl "birth">
       <with (1, 0, 0)><eval transl "one day old">
-      <with (d, 0, 0)><eval d> <eval transl "days old">
+      <with (d, 0, 0)><eval (string_of_int d)> <eval transl "days old">
       <with (_, 1, 0)><eval transl "one month old">
-      <with (_, m, 0)><eval m> <eval transl "months old">
+      <with (_, m, 0)><eval (string_of_int m)> <eval transl "months old">
       <with (_, 0, 1)><eval transl "one year old">
-      <with (_, m, 1)><eval (m + 12)> <eval transl "months old">
-      <with (_, _, y)><eval y> <eval transl "years old">
+      <with (_, m, 1)><eval (string_of_int (m+12))> <eval transl "months old">
+      <with (_, _, y)><eval (string_of_int y)> <eval transl "years old">
       </match>.</em><br>
     </if>
+  <with _>
   </match>
 </if>
 
@@ -269,6 +277,7 @@
   <with (Cremated None, "")>
   <with (Cremated None, s)>
     <em><eval transl_nth "Cremated" (sex p)> - <eval s>.</em><br>
+  <with _>
   </match>
 </if>
 
@@ -295,11 +304,13 @@
         <with (Some bd, DeadDontKnowWhen)><em><eval year_p bd>+</em>
         <with (Some bd, DontKnowIfDead)><em>*<eval year_p bd></em>
         <with (_, Death _ dd)><em>+<eval year_p dd></em>
+        <with _>
         </match>
       </if>
   </for>
   </ul>
   <p>
+<with _>
 </match>
 
 <match families p>
@@ -339,6 +350,7 @@
         <with (Some bd, DeadDontKnowWhen)> <em><eval year_p bd>+</em>
         <with (Some bd, DontKnowIfDead)> <em>*<eval year_p bd></em>
         <with (_, Death _ dd)> <em>+<eval year_p dd></em>
+        <with _>
         </match>
       </if>
     </for><strip>
@@ -364,6 +376,7 @@
           <with (Some bd, DeadDontKnowWhen)><em><eval year_p bd>+</em>
           <with (Some bd, DontKnowIfDead)><em>*<eval year_p bd></em>
           <with (_, Death _ dd)><em>+<eval year_p dd></em>
+          <with _>
           </match>
         </if>
       </for>
@@ -378,7 +391,7 @@
   <if notes p != "">
     <h3><eval transl_nth "Note/notes" 1></h3>
     <ul><li>
-    <eval notes p>
+    <eval expand_macros (notes p)>
     </ul>
     <p>
   </if>

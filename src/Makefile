@@ -1,15 +1,16 @@
-# $Id: Makefile,v 2.4.2.3 1999-04-09 14:09:25 ddr Exp $
+# $Id: Makefile,v 2.4.2.4 1999-04-11 01:19:13 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../wserver
 GWC_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo check.cmo pqueue.cmo consang.cmo gwcomp.cmo gwc.cmo
 CONSANG_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo mk_consang.cmo
-GWD_OBJS=../wserver/wserver.cmo argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo util.cmo date.cmo srcfile.cmo pXML.cmo eval.cmo global.cmo evalSheet.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo sendImage.cmo relation.cmo relationLink.cmo ascend.cmo descend.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthday.cmo birthDeath.cmo title.cmo family.cmo base64.cmo gwd.cmo
+GWD_OBJS=../wserver/wserver.cmo argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo util.cmo date.cmo srcfile.cmo pXML.cmo eval.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo sendImage.cmo relation.cmo relationLink.cmo ascend.cmo descend.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthday.cmo birthDeath.cmo title.cmo globDef.cmo global.cmo evalSheet.cmo sheet.cmo family.cmo base64.cmo gwd.cmo
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo select.cmo gwu.cmo
 all:: out
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 MOSTDESC_OBJS=adef.cmo name.cmo ansel.cmo gutil.cmo iovalue.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
+PA_SHEET_OBJS=pXML.cmo adef.cmo def.cmo eval.cmo pa_sheet.cmo 
 
 out:: def.syn.cmo gwc.out consang.out gwd.out gwu.out phonygwd.out i18n_check.out mostdesc.out
 	$(RM) gwc consang gwd gwu
@@ -67,6 +68,18 @@ i18n_check.out: i18n_check.cmo
 i18n: pr_transl.cmo always
 	if test -f i18n; then mv i18n i18n.bak; fi
 	OBJS=`(grep -w -c "transl conf" *.ml;grep -w -c "transl_nth conf" *.ml) | grep -v :0 | sed s/:.*$$//`; for i in $$OBJS; do echo $$i 1>&2; camlp4r pa_ifdef.cmo ./pa_lock.cmo ./pa_html.cmo ./pr_transl.cmo pa_extend.cmo $$i; done | sort | uniq > i18n
+
+pa_sheet.cma: $(PA_SHEET_OBJS)
+	$(OCAMLC) $(PA_SHEET_OBJS) -a -o pa_sheet.cma
+def.cmo: def.mli
+	@$(CAMLP4_COMM) $(CAMLP4F) -o $*.ppo -impl $<
+	$(OCAMLC) $(OCAMLI) -I $(CAMLP4D) -c -impl $*.ppo
+	$(RM) $*.ppo
+
+.SUFFIXES: .txt
+
+.txt.cmo:
+	$(OCAMLC) -pp "camlp4 ./pa_sheet.cma pr_dump.cmo -param `head -1 $< | sed -e 's/<comm param = //' -e 's/>//'` -impl" -c -impl $<
 
 always:
 

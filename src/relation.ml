@@ -1,5 +1,5 @@
-(* camlp4r ./pa_lock.cmo ./pa_html.cmo q_MLast.cmo *)
-(* $Id: relation.ml,v 2.7.2.4 1999-04-09 14:09:31 ddr Exp $ *)
+(* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
+(* $Id: relation.ml,v 2.7.2.5 1999-04-11 01:19:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -177,17 +177,19 @@ value print_link conf base n p1 p2 x1 x2 =
      else if x1 < x2 then
        do Wserver.wprint "%s" (brother_label conf x1 p1.sex);
           Wserver.wprint " %s"
-            (transl_decline conf "of" (ancestor_label conf (x2 - x1) Neuter));
+            (transl_decline conf
+             "of (same or greater generation level)"
+             (ancestor_label conf (x2 - x1) Neuter));
        return ()
      else
        do Wserver.wprint "%s" (descendant_label conf (x1 - x2) p1);
           Wserver.wprint " %s"
-            (transl_decline conf "of" (brother_label conf x2 Male));
+            (transl_decline conf "of (same or greater generation level)"
+             (brother_label conf x2 Male));
        return ();
      Wserver.wprint "</strong>\n%s "
-       (if x1 < x2 then
-          transl_decline conf "of (person of lower generation level)" ""
-        else transl_decline conf "of" "");
+       (if x1 < x2 then transl_decline conf "of" ""
+        else transl_decline conf "of (same or greater generation level)" "");
      afficher_personne_sans_titre conf base p2;
      afficher_titre conf base p2;
      Wserver.wprint ".\n";
@@ -277,13 +279,13 @@ value print_solution_not_ancestor conf base p1 p2 x1 x2 list =
   do tag "ul" begin
        html_li conf;
        Wserver.wprint "%s %s\n" (lab x1)
-         (transl_decline conf "of (person of lower generation level)" "");
+         (transl_decline conf "of" "");
        afficher_personne_sans_titre conf base p1;
        afficher_titre conf base p1;
        Wserver.wprint "\n";
        html_li conf;
        Wserver.wprint "%s %s\n" (lab x2)
-         (transl_decline conf "of (person of lower generation level)" "");
+         (transl_decline conf "of" "");
        afficher_personne_sans_titre conf base p2;
        afficher_titre conf base p2;
        Wserver.wprint "\n";
@@ -381,32 +383,9 @@ value compute_relationship conf base p1 p2 =
       Some (rl, total, relationship)
 ;
 
-value loc = (0, 0);
-
-value print_main_relationship conf base p1 p2 =
+value print_main_relationship conf base p1 p2 rel =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
-  let rel = compute_relationship conf base p1 p2 in
-  do conf.senv := [];
-     let env =
-      [("result",
-        {Eval.cval =
-           Obj.repr
-             (rel :
-                option
-                  (list (int * int * list (person * int)) * Num.t * float));
-         Eval.ctyp =
-           <:ctyp<
-             option
-               (list (int * int * list (person * int)) * num * float) >>});
-       ("p2",
-        {Eval.cval = Obj.repr (p2 : person);
-         Eval.ctyp = <:ctyp< person >>});
-       ("p1",
-        {Eval.cval = Obj.repr (p1 : person);
-         Eval.ctyp = <:ctyp< person >>})]
-     in
-     EvalSheet.f conf base env "relation_ok";
-     header conf title;
+  do header conf title;
      match rel with
      [ None ->
          if p1.cle_index == p2.cle_index then
@@ -468,13 +447,13 @@ value print_base_loop conf base =
 ;
 
 value print conf base p =
-  try
-    match p_getint conf.senv "ei" with
-    [ Some i -> print_main_relationship conf base (base.data.persons.get i) p
-    | _ ->
-        match find_person_in_env conf base "1" with
-        [ Some p1 -> print_main_relationship conf base p1 p
-        | _ -> print_menu conf base p ] ]
-  with
-  [ Consang.TopologicalSortError -> print_base_loop conf base ]
+  fun
+  [ Some p1 ->
+      match
+        try Some (compute_relationship conf base p1 p) with
+        [ Consang.TopologicalSortError -> None ]
+      with
+      [ Some rel -> print_main_relationship conf base p1 p rel
+      | None -> print_base_loop conf base ]
+  | None -> print_menu conf base p ]
 ;
