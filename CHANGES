@@ -1,5 +1,8 @@
-GeneWeb version 2.08
+GeneWeb version 3.00
 --------------------
+
+New look for GeneWeb! Icon, default background, new structures of pages.
+Thanks to Emmanuelle Visseaux.
 
 * GeneWeb Service/CGI (gwd)
   - [Oct 21, 99] Added message "or Sosa number relative to x" when displaying

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.150.2.2 1999-10-25 11:08:53 ddr Exp $
+# $Id: lexicon.txt,v 2.150.2.3 1999-10-25 13:10:02 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2029,6 +2029,7 @@ pt: sua esposa/seu marido
 se: hans maka/hennes make
 
     history of updates
+de: Chronik der Aktualisierungen
 dk: opdateringers historie
 en: history of updates
 eo: historio de la gxisdatigoj
@@ -2480,13 +2481,13 @@ cs: ¾enatý/vdaná
 de: verheiratet
 dk: gift
 en: married
-es: casados
-fr: mari&eacute;s
+es: casado/casados
+fr: mari&eacute;/mari&eacute;s
 he:  ðùåàéí
 it: sposati
 nl: gehuwd
 no: gift
-pt: casados
+pt: casado/casados
 se: gifta
 
     married at age %t
