@@ -1,5 +1,5 @@
-(* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.7 1999-04-07 19:22:59 ddr Exp $ *)
+(* camlp4r ./pa_lock.cmo ./pa_html.cmo q_MLast.cmo *)
+(* $Id: relation.ml,v 2.7.2.1 1999-04-08 16:54:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -381,10 +381,31 @@ value compute_relationship conf base p1 p2 =
       Some (rl, total, relationship)
 ;
 
+value loc = (0, 0);
+
 value print_main_relationship conf base p1 p2 =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
   let rel = compute_relationship conf base p1 p2 in
   do conf.senv := [];
+     let env =
+      [("result",
+        {Eval.cval =
+           Obj.repr
+             (rel :
+                option
+                  (list (int * int * list (person * int)) * Num.t * float));
+         Eval.ctyp =
+           <:ctyp<
+             option
+               (list (int * int * list (person * int)) * num * float) >>});
+       ("p2",
+        {Eval.cval = Obj.repr (p2 : person);
+         Eval.ctyp = <:ctyp< person >>});
+       ("p1",
+        {Eval.cval = Obj.repr (p1 : person);
+         Eval.ctyp = <:ctyp< person >>})]
+     in
+     InterpSheet.eval conf base env "relation_ok.tpl";
      header conf title;
      match rel with
      [ None ->

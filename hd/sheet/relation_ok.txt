@@ -1,0 +1,108 @@
+<comm e="$Id: relation_ok.txt,v 1.1.2.1 1999-04-08 16:54:08 ddr Exp $">
+<comm e="Copyright (c) 1999 INRIA">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <meta name="ROBOTS" content="NONE">
+  <title><eval transl "Relationship"></title>
+</head>
+<body>
+<h1><eval transl "Relationship"></h1>
+
+<match result>
+<case None>
+  <if p1 = p2><eval transl  "It is the same person!">
+  <else>
+    <format (transl "No known relationship link between %t and %t")>
+      <match main_title p1>
+      <case Some t when not (is_private_access p1)>
+        <a href="`commd``access p1`">
+        <eval titled_person_text p1 t></a>,
+        <em><eval title_ident t> <eval title_place t></em>
+      <case _><a href="`commd``access p1`"><eval person_text p1></a>
+      </match>
+      <match main_title p2>
+      <case Some t when not (is_private_access p2)>
+        <a href="`commd``access p2`">
+        <eval titled_person_text p2 t></a>,
+        <em><eval title_ident t> <eval title_place t></em>
+      <case _><a href="`commd``access p2`"><eval person_text p2></a>
+      </match>
+  </if>
+<case Some (rel_list, total, relationship_value)>
+  <for (n1, n2, list) in rel_list>
+    <match main_title p2>
+    <case Some t>
+      <eval titled_person_text p2 t>,
+      <em><eval title_ident t> <eval title_place t></em>
+    <case None><eval person_text p2>
+    </match>
+    <eval transl "is">
+    <strong>
+      <match (n1, n2)>
+      <case (1, 0)>
+        <eval transl_nth "the father/the mother/a parent" (sex p2)>
+      <case (2, 0)>
+        <eval transl_nth "a grandfather/a grandmother/a grandparent"
+         (sex p2)>
+      <case (3, 0)>
+        <eval transl_nth
+         "a great-grandfather/a great-grandmother/a great-grandparent"
+         (sex p2)>
+      <case (n, 0)>
+        <eval transl_nth "an ancestor" (sex p2)>
+        <format (transl "of the %s generation")
+          (transl_nth "nth (generation)" n)>
+      <case (1, 1)>
+        <if list_length list = 1>
+          <eval transl_nth "a half-brother/a half-sister/a half-sibling"
+             (sex p2)>
+        <else>
+          <eval transl_nth "a brother/a sister/a sibling" (sex p2)>
+        </if>
+      <case (2, 2)><eval transl_nth "a cousin" (sex p2)>
+      <case (3, 3)><eval transl_nth "a 2nd cousin" (sex p2)>
+      <case (_, _) when n1 = n2>
+        <format (transl_nth "a %s cousin" (sex p2))
+           (transl_nth (transl_nth "*nth (cousin)*" (sex p2)) (n1 - 1))>
+      <case _>xxx (<eval n1> <eval n2>)
+      </match>
+    </strong>
+    <if n1 \> n2><eval transl_nth "of (person of lower generation level)" 0>
+    <else><eval transl_nth "of" 0></if>
+    <match main_title p1>
+    <case Some t>
+      <eval titled_person_text p1 t>,
+      <em><eval title_ident t> <eval title_place t></em>.
+    <case None><eval person_text p1>.
+    </match>
+    <if n1 = 0 OR n2 = 0> (ancestor)
+    <else>
+      <ul><li><eval transl "Indeed,">
+        <ul>
+        <for (a, n) in list>
+          <li>
+            <match main_title a>
+            <case Some t>
+              <eval titled_person_text a t>,
+              <em><eval title_ident t> <eval title_place t></em>.
+            <case None><eval person_text a>
+            </match>
+        </for>
+        </ul>
+      </ul>
+    </if>
+    <p>
+  </for>
+  <eval transl "Total">:
+  <em>
+    <eval string_of_num total>
+    <if string_of_num total = "1">
+       <eval transl_nth "relationship link/relationship links" 0>
+    <else><eval transl_nth "relationship link/relationship links" 1>
+    </if>
+  </em>
+</match>
+
+</body>
+
+<p>

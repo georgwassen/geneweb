@@ -1,5 +1,5 @@
-(* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.15 1999-04-07 19:22:59 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo q_MLast.cmo *)
+(* $Id: perso.ml,v 2.15.2.1 1999-04-08 16:54:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -737,6 +737,45 @@ value print_ancestors_descends_cousins conf base p a =
 
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
+value loc = (0, 0);
+
+Hashtbl.add Global.table
+  "has_grand_children"
+  (fun conf base ->
+     Obj.repr
+       (a_des_petits_enfants base :
+        person -> bool),
+   <:ctyp< person -> bool >>)
+;
+
+Hashtbl.add Global.table
+  "has_grand_parents"
+  (fun conf base ->
+     Obj.repr
+       (fun p -> grand_parent_connu base (aoi base p.cle_index) :
+        person -> bool),
+   <:ctyp< person -> bool >>)
+;
+
+Hashtbl.add Global.table
+  "find_sosa"
+  (fun conf base ->
+     Obj.repr
+       (find_sosa_optim conf base :
+        person -> person -> option Num.t),
+   <:ctyp< person -> person -> option num >>)
+;
+
+Hashtbl.add Global.table
+  "titles"
+  (fun conf base ->
+     Obj.repr
+       (fun p ->
+          print_titles conf base (transl conf "and") p (aoi base p.cle_index) :
+        person -> unit),
+   <:ctyp< person -> unit >>)
+;
+
 value print conf base p =
   let title h =
     match (sou base p.public_name, p.nick_names) with
@@ -777,6 +816,13 @@ value print conf base p =
           return () ]
   in
   let a = aoi base p.cle_index in
+  do let env =
+      [("p",
+        {Eval.cval = Obj.repr (p : person);
+         Eval.ctyp = <:ctyp< person >>})]
+    in
+    InterpSheet.eval conf base env "perso.tpl";
+  return
   do header conf title;
      print_sosa_if_any conf base p;
      print_link_to_welcome conf True;
