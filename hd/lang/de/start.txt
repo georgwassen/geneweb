@@ -27,7 +27,7 @@ height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <p>
 
 Die Datenbank <font color=green><b>"%t"</b></font> enth&auml;lt
-z.Zt. %n Personen.%o<br>
+z. Zt. %n Personen.%o<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%o
 
 %y<br><p>
