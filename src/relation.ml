@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo q_MLast.cmo *)
-(* $Id: relation.ml,v 2.7.2.1 1999-04-08 16:54:13 ddr Exp $ *)
+(* $Id: relation.ml,v 2.7.2.2 1999-04-09 06:36:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -405,7 +405,7 @@ value print_main_relationship conf base p1 p2 =
         {Eval.cval = Obj.repr (p1 : person);
          Eval.ctyp = <:ctyp< person >>})]
      in
-     InterpSheet.eval conf base env "relation_ok.tpl";
+     InterpSheet.eval conf base env "relation_ok";
      header conf title;
      match rel with
      [ None ->
