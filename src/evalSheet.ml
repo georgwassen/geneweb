@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: evalSheet.ml,v 1.1.2.1 1999-04-08 16:54:11 ddr Exp $ *)
+(* $Id: evalSheet.ml,v 1.1.2.2 1999-04-08 21:18:23 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -60,7 +60,7 @@ and make_match cases =
   fun
   [ [PXML.Xtag "case" [(_, p)] :: xast] -> make_match_case cases p xast
   | [PXML.Xetag "match" :: xast] -> Some (List.rev cases, xast)
-  | [PXML.Xtext _ | PXML.Xnewl | PXML.Xind _ :: xast] -> make_match cases xast
+  | [PXML.Xtext _ | PXML.Xind _ :: xast] -> make_match cases xast
   | _ -> None ]
 and make_match_case cases p xast =
   match make_sequence_upto stop_match_case [] xast with
@@ -83,7 +83,7 @@ and make_sequence_upto_etag t stats xast =
 
 value rec strip =
   fun
-  [ [Sxml (PXML.Xnewl | PXML.Xind _) :: statl] -> strip statl
+  [ [Sxml (PXML.Xind _) :: statl] -> strip statl
   | statl -> statl ]
 ;
 
@@ -111,7 +111,9 @@ value setindent ind statl =
 
 value rec get_min_indent =
   fun
-  [ [Sxml (PXML.Xind ind) :: statl] ->
+  [ [(Sxml (PXML.Xind _) as stat); Sxml (PXML.Xind _) :: statl] ->
+      get_min_indent [stat :: statl]
+  | [Sxml (PXML.Xind ind) :: statl] ->
       match get_min_indent statl with
       [ Some sind -> Some (min ind sind)
       | None -> Some ind ]
@@ -122,7 +124,7 @@ value rec get_min_indent =
 value reindent statl =
   let rev_statl =
     match List.rev statl with
-    [ [Sxml (PXML.Xind ind); Sxml PXML.Xnewl :: statl] ->
+    [ [Sxml (PXML.Xind ind) :: statl] ->
         match get_min_indent statl with
         [ Some sind -> setindent (sind - ind) statl
         | None -> statl ]
@@ -143,14 +145,8 @@ value string_of_dyn d =
   | x -> Eval.not_impl "string_of_dyn ctyp" x ]
 ;
 
-value number_of_consecutive_nl = ref 0;
-value wprint fmt =
-  do number_of_consecutive_nl.val := 0; return Wserver.wprint fmt
-;
-value wprint_nl () =
-  if number_of_consecutive_nl.val >= 2 then ()
-  else do incr number_of_consecutive_nl; return Wserver.wprint "\n"
-;
+value bof = ref True;
+value wprint fmt = do bof.val := False; return Wserver.wprint fmt;
 
 value eval_string_with_antiquot global env s =
   eval 0 where rec eval i =
@@ -168,25 +164,41 @@ value eval_string_with_antiquot global env s =
     else ()
 ;
 
-value rec eval_sequence conf global env =
+value flush_nl =
   fun
-  [ [] -> ()
+  [ [ind :: indl] ->
+      do if bof.val then ()
+         else List.iter (fun _ -> wprint "\n") [ind :: indl];
+         for i = 1 to ind do wprint " "; done;
+      return ()
+  | [] -> () ]
+;
+
+value rec eval_sequence conf global env pend_nl =
+  fun
+  [ [] -> pend_nl
   | [stat :: statl] ->
-      let statl = eval_statement conf global env statl stat in
-      eval_sequence conf global env statl ]
-and eval_statement conf global env statl =
+      let (pend_nl, statl) =
+        eval_statement conf global env pend_nl statl stat
+      in
+      eval_sequence conf global env pend_nl statl ]
+and eval_statement conf global env pend_nl statl =
   fun
   [ Sif e then_c else_c ->
-      do eval_if conf global env e then_c else_c; return statl
+      do eval_if conf global env pend_nl e then_c else_c; return
+      ([], statl)
   | Sfor e body ->
-      do eval_for conf global env e body; return statl
+      do eval_for conf global env pend_nl e body; return ([], statl)
   | Smatch e pwel ->
-      do eval_match conf global env (Eval.expr global env e) pwel; return statl
-  | Sxml (PXML.Xtext s) -> do wprint "%s" s; return statl
+      do eval_match conf global env pend_nl (Eval.expr global env e) pwel;
+      return ([], statl)
+  | Sxml (PXML.Xtext s) ->
+      do flush_nl pend_nl; wprint "%s" s; return ([], statl)
   | Sxml (PXML.Xtag t tenv) ->
       match (String.lowercase t, tenv) with
       [ ("a" | "img", tenv) ->
-          do wprint "<%s" t;
+          do flush_nl pend_nl;
+             wprint "<%s" t;
              List.iter
                (fun (k, s) ->
                   do wprint " %s=" k;
@@ -194,25 +206,32 @@ and eval_statement conf global env statl =
                   return ())
                tenv;
              wprint ">";
-          return statl
-      | ("comm", _) -> strip statl
-      | ("strip", _) -> strip statl
+          return ([], statl)
+      | ("comm", _) -> ([], statl)
+      | ("strip", _) -> ([], strip statl)
       | ("eval", [(_, v)]) ->
-          do wprint "%s" (string_of_dyn (Eval.expr global env v));
-          return statl
+          do flush_nl pend_nl;
+             wprint "%s" (string_of_dyn (Eval.expr global env v));
+          return ([], statl)
       | ("format", [(_, v)]) ->
-          Eval.wrap v (fun () -> eval_format conf global env statl v)
+          Eval.wrap v
+            (fun () ->
+               do flush_nl pend_nl; return
+               ([], eval_format conf global env [] statl v))
       | _ ->
-          do wprint "<%s" t;
+          do flush_nl pend_nl;
+             wprint "<%s" t;
              List.iter (fun (p, e) -> wprint " %s=%s" p e) tenv;
              wprint ">";
-          return statl ]
-  | Sxml (PXML.Xetag "body") -> do trailer conf; return statl
-  | Sxml (PXML.Xetag t) -> do wprint "</%s>" t; return statl
+          return ([], statl) ]
+  | Sxml (PXML.Xetag "body") ->
+      let pend_nl = match pend_nl with [ [_ :: l] -> l | [] -> [] ] in
+      do flush_nl pend_nl; trailer conf; return ([], strip statl)
+  | Sxml (PXML.Xetag t) ->
+      do flush_nl pend_nl; wprint "</%s>" t; return ([], statl)
   | Sxml (PXML.Xind ind) ->
-      do for i = 1 to ind do wprint " "; done; return statl
-  | Sxml PXML.Xnewl -> do wprint_nl (); return statl ]
-and eval_format conf global env statl v =
+      ([ind :: pend_nl], statl) ]
+and eval_format conf global env pend_nl statl v =
   let (fast, astl) = Eval.simple_expr_list v in
   let x = Eval.eval_expr global env fast in
   match x.Eval.ctyp with
@@ -229,7 +248,10 @@ and eval_format conf global env statl v =
               | ('t', _) ->
                   match strip statl with
                   [ [stat :: statl] ->
-                      (eval_statement conf global env statl stat, astl)
+                      let (pend_nl, statl) =
+                        eval_statement conf global env [] statl stat
+                      in
+                      (statl, astl)
                   | [] -> do wprint "%%t"; return (statl, astl) ]
               | (c, _) -> do wprint "%%%c" c; return (statl, astl) ]
             in
@@ -240,16 +262,17 @@ and eval_format conf global env statl v =
           do wprint "%c" f.[i]; return statl
         else statl
   | t -> Eval.error v "format not of type string" (Some t) ]
-and eval_if conf global env exp then_c else_c =
+and eval_if conf global env pend_nl exp then_c else_c =
   let e = Eval.expr global env exp in
   match e.Eval.ctyp with
   [ <:ctyp< bool >> ->
-      if (Obj.magic e.Eval.cval : bool) then
-        eval_sequence conf global env (strip (reindent then_c))
-      else
-        eval_sequence conf global env (strip (reindent else_c))
+      let seq =
+        if (Obj.magic e.Eval.cval : bool) then then_c else else_c
+      in
+      let _ = eval_sequence conf global env pend_nl (strip (reindent seq)) in
+      ()
   | t -> Eval.error exp "if condition is not of type bool" (Some t) ]
-and eval_for conf global env s body =
+and eval_for conf global env pend_nl s body =
   let (p, e) = Eval.patt_in_expr global env s in
   match e.Eval.ctyp with
   [ <:ctyp< list $t$ >> ->
@@ -260,7 +283,10 @@ and eval_for conf global env s body =
              let body = if first then strip body else body in
              let x = {Eval.cval = x; Eval.ctyp = t} in
              do match Eval.eval_matching global env x (p, None) with
-                [ Some new_env -> eval_sequence conf global new_env body
+                [ Some new_env ->
+                    let pend_nl = if first then pend_nl else [] in
+                    let _ = eval_sequence conf global new_env pend_nl body in
+                    ()
                 | None ->
                     Eval.error s "pattern type does not match expression type"
                       (Some t) ];
@@ -269,15 +295,15 @@ and eval_for conf global env s body =
       in
       ()
   | t -> Eval.error s "for set is not of type list" (Some t) ]
-and eval_match conf global env exp =
+and eval_match conf global env pend_nl exp =
   fun
   [ [(p, statl) :: pwel] ->
       match Eval.matching global env exp p with
       [ Some new_env ->
           let statl = strip (reindent statl) in
-          eval_sequence conf global new_env statl
+          let _ = eval_sequence conf global new_env pend_nl statl in ()
       | None ->
-          eval_match conf global env exp pwel ]
+          eval_match conf global env pend_nl exp pwel ]
   | [] -> () ]
 ;
 
@@ -296,7 +322,7 @@ value eval conf base env fname =
       {Eval.cval = f conf base; Eval.ctyp = t}
     in
     let seq = make_sequence [] xast in
-    eval_sequence conf global env seq
+    let pend_nl = eval_sequence conf global env [] seq in flush_nl pend_nl
   with
   [ Exit -> ()
   | Stdpp.Exc_located loc (Stream.Error err) ->

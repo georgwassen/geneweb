@@ -1,5 +1,10 @@
-<comm e="$Id: perso.txt,v 1.1.2.1 1999-04-08 16:54:07 ddr Exp $">
+<comm e="$Id: perso.txt,v 1.1.2.2 1999-04-08 21:18:21 ddr Exp $">
 <comm e="Copyright (c) 1999 INRIA">
+<comm
+  Context:
+    p = person to be displayed
+>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <meta name="ROBOTS" content="NONE">
@@ -12,6 +17,7 @@
   </title>
 </head>
 <body>
+
 <h1>
   <match (public_name p, qualifiers p)>
   <case (n, [nn :: _]) when n != ""><eval n> <em><eval nn></em>
@@ -41,11 +47,11 @@
 </match>
 
 <if is_rtl>
-  <a href=`commd`>
+  <a href="`commd`">
   <img
    src="`commd`m=IM;v=up.gif" width=16 height=16 alt="^^" align="left"></a>
 <else>
-  <a href=`commd`>
+  <a href="`commd`">
   <img
    src="`commd`m=IM;v=up.gif" width=16 height=16 alt="^^" align="right"></a>
 </if>
@@ -191,15 +197,15 @@
         <eval titled_person_text p t></a>,
         <em><eval title_ident t> <eval title_place t></em>
       <case _><eval person_text p></a>
-      </match><strip>
+      </match>
       <if auth p>
         <match (birth_date p, death p)>
-        <case (Some bd, NotDead)><em> <eval year_p bd>-</em>
-        <case (Some bd, Death _ dd)><em> <eval year_p bd>-<eval year_p dd></em>
-        <case (Some bd, DeadYoung)><em> <eval year_p bd>+</em>
-        <case (Some bd, DeadDontKnowWhen)><em> <eval year_p bd>+</em>
-        <case (Some bd, DontKnowIfDead)><em> *<eval year_p bd></em>
-        <case (_, Death _ dd)><em> +<eval year_p dd></em>
+        <case (Some bd, NotDead)><em><eval year_p bd>-</em>
+        <case (Some bd, Death _ dd)><em><eval year_p bd>-<eval year_p dd></em>
+        <case (Some bd, DeadYoung)><em><eval year_p bd>+</em>
+        <case (Some bd, DeadDontKnowWhen)><em><eval year_p bd>+</em>
+        <case (Some bd, DontKnowIfDead)><em>*<eval year_p bd></em>
+        <case (_, Death _ dd)><em>+<eval year_p dd></em>
         </match>
       </if>
   </for>
@@ -222,7 +228,7 @@
         <if auth p AND auth (spouse p fam)>
           <match (marriage_date fam, marriage_place fam)>
           <case (None, "")>
-          <case (None, s)> <em><eval s></em>
+          <case (None, s)>, <em><eval s></em>,
           <case (Some d, "")> <em><eval ondate d></em>
           <case (Some d, s)> <em><eval ondate d>, <eval s></em>,
           </match>
@@ -235,7 +241,7 @@
         <eval titled_person_text p t></a>,
         <em><eval title_ident t> <eval title_place t></em>
       <case _><eval person_text p></a>
-      </match><strip>
+      </match>
       <if auth p>
         <match (birth_date p, death p)>
         <case (Some bd, NotDead)> <em><eval year_p bd>-</em>
@@ -259,17 +265,16 @@
           <a href="`commd``access c`"><eval first_name c> <eval surname c></a>
         <else>
           <a href="`commd``access c`"><eval first_name c></a>
-        </if><strip>
+        </if>
         <if auth p>
           <match (birth_date c, death c)>
-          <case (Some bd, NotDead)><em> <eval year_p bd>-</em>
+          <case (Some bd, NotDead)><em><eval year_p bd>-</em>
           <case (Some bd, Death _ dd)>
-            <em> <eval year_p bd>-<eval year_p dd></em>
-          <case (Some bd, DeadYoung)><em> <eval year_p bd>+</em>
-          <case (Some bd, DeadDontKnowWhen)><em> <eval year_p bd>+</em>
-          <case (Some bd, DontKnowIfDead)><em> *<eval year_p bd></em>
-          <case (_, Death _ dd)><em> +<eval year_p dd></em>
-          <case _>
+            <em><eval year_p bd>-<eval year_p dd></em>
+          <case (Some bd, DeadYoung)><em><eval year_p bd>+</em>
+          <case (Some bd, DeadDontKnowWhen)><em><eval year_p bd>+</em>
+          <case (Some bd, DontKnowIfDead)><em>*<eval year_p bd></em>
+          <case (_, Death _ dd)><em>+<eval year_p dd></em>
           </match>
         </if>
       </for>

@@ -1,5 +1,24 @@
-<comm e="$Id: relation_ok.txt,v 1.1.2.1 1999-04-08 16:54:08 ddr Exp $">
+<comm e="$Id: relation_ok.txt,v 1.1.2.2 1999-04-08 21:18:21 ddr Exp $">
 <comm e="Copyright (c) 1999 INRIA">
+<comm
+  Context:
+    p1          first person
+    p2          person the relationship is computed with
+    result      result of this relationship
+
+  The result is an option type:
+  - "None" means "p1 = p2" or no relationship between p1 and p2
+  - "Some (rel_list, total, value)" means found relationship(s)
+    The variable "rel_list" is a list of (n1, n2, list):
+      n1 is the length of the first branch to the common ancestor
+      n2 is the length of the second branch to the common ancestor
+      list is a list of (p, n):
+        p is a common ancestor
+        n is the number of relationships passing by him.
+    The variable "total" is the total number of relationships.
+    The variable "value" is the relationship value (consanguinity).
+>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <meta name="ROBOTS" content="NONE">
@@ -30,6 +49,7 @@
   </if>
 <case Some (rel_list, total, relationship_value)>
   <for (n1, n2, list) in rel_list>
+
     <match main_title p2>
     <case Some t>
       <eval titled_person_text p2 t>,
@@ -93,6 +113,7 @@
     </if>
     <p>
   </for>
+
   <eval transl "Total">:
   <em>
     <eval string_of_num total>
@@ -104,5 +125,3 @@
 </match>
 
 </body>
-
-<p>

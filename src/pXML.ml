@@ -1,13 +1,12 @@
 (* camlp4r *)
-(* $Id: pXML.ml,v 1.1.2.1 1999-04-08 16:54:12 ddr Exp $ *)
+(* $Id: pXML.ml,v 1.1.2.2 1999-04-08 21:18:23 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type xast =
   [ Xtag of string and list (string * string)
   | Xetag of string
   | Xtext of string
-  | Xind of int
-  | Xnewl ]
+  | Xind of int ]
 ;
 
 value buff = ref (String.create 80);
@@ -101,7 +100,7 @@ value rec elem ind strm =
   | None ->
       match strm with parser
       [ [: `'<'; t = tag?"tag expected"; `'>'?"'>' expected" :] -> (t, None)
-      | [: `'\n' :] -> (Xnewl, Some 0)
+      | [: `'\n' :] -> elem (Some 0) strm
       | [: `x; len = text (store 0 x) :] -> (Xtext (get_buff len), None) ] ]
 ;
 

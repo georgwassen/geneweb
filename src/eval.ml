@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: eval.ml,v 1.1.2.1 1999-04-08 16:54:39 ddr Exp $ *)
+(* $Id: eval.ml,v 1.1.2.2 1999-04-08 21:18:22 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -93,6 +93,7 @@ GEXTEND G
       | s = INT -> <:expr< $int:s$ >>
       | id = LIDENT -> <:expr< $lid:id$ >>
       | id = UIDENT -> <:expr< $uid:id$ >>
+      | "["; "]" -> <:expr< [] >>
       | "["; e = expr; "]" -> <:expr< [$e$] >>
       | "["; e = expr; ";"; el = LIST1 expr SEP ";"; "]" ->
           List.fold_right (fun e el -> <:expr< [$e$ :: $el$] >>) [e :: el]
@@ -137,6 +138,7 @@ value rec unify t1 t2 =
   | (<:ctyp< $t11$ $t12$ >>, <:ctyp< $t21$ $t22$ >>) ->
       unify t11 t21 @ unify t12 t22
   | (<:ctyp< '$x$ >>, t2) -> [(x, t2)]
+  | (t1, <:ctyp< '$x$ >>) -> [(x, t1)]
   | (t1, t2) ->
       do Printf.eprintf "t1: "; print_type (fun s -> Printf.eprintf "%s" s) t1;
          Printf.eprintf "\n";
