@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_sheet.ml,v 1.1.2.3 1999-04-11 19:28:13 ddr Exp $ *)
+(* $Id: pa_sheet.ml,v 1.1.2.4 1999-04-12 16:15:44 ddr Exp $ *)
 
 value token_of_xast =
   fun
@@ -16,6 +16,7 @@ value token_of_xast =
       | "img" -> ("IMG", p)
       | "let" -> ("LET", p)
       | "match" -> ("MATCH", p)
+      | "strip" -> ("STRIP", p)
       | "with" -> ("WITH", p)
       | t -> if p = "" then ("TAG", t) else ("TAG", t ^ " " ^ p) ]
   | PXML.Xetag t ->
@@ -73,7 +74,7 @@ value lexer_using (p_con, p_prm) =
   match p_con with
   [ "A" | "BODY" | "COMM" | "E_BODY" | "E_FOR" | "E_FORMAT" | "E_IF"
   | "E_MATCH" | "ELSE" | "EOI" | "ETAG" | "EVAL" | "FOR" | "FORMAT" | "IF"
-  | "IMG" | "IND" | "LET" | "MATCH" | "TAG" | "TEXT" | "WITH" -> ()
+  | "IMG" | "IND" | "LET" | "MATCH" | "STRIP" | "TAG" | "TEXT" | "WITH" -> ()
   | _ ->
       raise (Token.Error ("\
 the constructor \"" ^ p_con ^ "\" is not recognized by Plexer")) ]
@@ -221,7 +222,8 @@ value adjust_expr =
     match e with
     [ <:expr< $e1$ $e2$ >> -> <:expr< $expr env e1$ $expr env e2$ >>
     | <:expr< do $list:el$ return $e$ >> ->
-        <:expr< do $list:List.map (expr env) el$ return $expr env e$ >>
+        let el = sequence env el in
+        <:expr< do $list:el$ return $expr env e$ >>
     | <:expr< let $p$ = $e1$ in $e2$ >> ->
         let nenv = get_defined_ident p @ env in
         <:expr< let $p$ = $expr env e1$ in $expr nenv e2$ >>
@@ -231,11 +233,16 @@ value adjust_expr =
     | <:expr< if $e1$ then $e2$ else $e3$ >> ->
         <:expr< if $expr env e1$ then $expr env e2$ else $expr env e3$ >>
     | <:expr< fun $p$ -> $e$ >> ->
-        <:expr< fun $p$ -> $expr (get_defined_ident p @ env) e$ >>
+       <:expr< fun $p$ -> $expr (get_defined_ident p @ env) e$ >>
     | <:expr< ($list:el$) >> -> <:expr< ($list:List.map (expr env) el$) >>
     | <:expr< $lid:s$ >> ->
         if List.mem s env then e else <:expr< $e$ conf base >>
     | _ -> e ]
+  and sequence env =
+    fun
+    [ [<:expr< do $list:el1$ return () >> :: el] -> sequence env (el1 @ el)
+    | [e :: el] -> [expr env e :: sequence env el]
+    | [] -> [] ]
   and match_case env (p, w, e) =
     let env = get_defined_ident p @ env in
     let w =
@@ -274,6 +281,60 @@ value print_with_antiquot loc sh s =
     else []
 ;
 
+value rec strip =
+  fun
+  [ [<:expr< indent $_$ >> :: el] -> strip el
+  | el -> el ]
+;
+
+value setindent ind el =
+  let rec do_e e =
+    let loc = MLast.loc_of_expr e in
+    match e with
+    [ <:expr< do $list:el$ return $e$ >> ->
+        <:expr< do $list:List.map do_e el$ return $e$ >>
+    | <:expr< if $e$ then $then_c$ else $else_c$ >> ->
+        <:expr< if $e$ then $do_e then_c$ else $do_e else_c$ >>
+    | <:expr< List.iter (fun $p$ -> $body$) $e$ >> ->
+        <:expr< List.iter (fun $p$ -> $do_e body$) $e$ >>
+    | <:expr< match $e$ with [ $list:ml$ ] >> ->
+        <:expr< match $e$ with [ $list:List.map do_match_case ml$ ] >>
+    | <:expr< indent $int:ind0$ >> ->
+        let ind = max 0 (int_of_string ind0 - ind) in
+        <:expr< indent $int:string_of_int ind$ >>
+    | x -> x ]
+  and do_match_case (p, w, e) =
+    (p, w, do_e e)
+  in
+  List.map do_e el
+;
+
+value rec get_min_indent =
+  fun
+  [ [(<:expr< indent $_$ >> as e); <:expr< indent $_$ >> :: el] ->
+      get_min_indent [e :: el]
+  | [<:expr< indent $int:ind$ >> :: el] ->
+      let ind = int_of_string ind in
+      match get_min_indent el with
+      [ Some sind -> Some (min ind sind)
+      | None -> Some ind ]
+  | [_ :: el] -> get_min_indent el
+  | [] -> None ]
+;
+
+value reindent el =
+  let rev_el =
+    match List.rev el with
+    [ [<:expr< indent $int:ind$ >> :: el] ->
+        let ind = int_of_string ind in
+        match get_min_indent el with
+        [ Some sind -> setindent (sind - ind) el
+        | None -> el ]
+    | el -> el ]
+  in
+  List.rev rev_el
+;
+
 value glob_no_conf_base =
   ["&&"; "||"; "+"; "-"; "^"; "="; "<>"; "<"; ">"; "not"; "string_of_int";
    "indent"; "wprint"]
@@ -283,6 +344,15 @@ EXTEND
   GLOBAL: implem expr;
   implem:
     [ [ el = LIST1 expr; EOI ->
+          let el =
+            strip2 el where rec strip2 =
+              fun
+              [ [<:expr< indent $_$ >> ::
+                 ([<:expr< indent $_$ >>:: _] as el)] ->
+                  strip2 el
+              | [<:expr< indent 0 >> :: el] -> el
+              | el -> el ]
+          in                  
           let env = param_list () in
           let el = List.map (adjust_expr (env @ glob_no_conf_base)) el in
           let e =
@@ -298,7 +368,7 @@ EXTEND
           <:expr< match $e$ with [ $list:ml$ ] >>
       | e = LET; el = LIST0 expr ->
           let (p, e) = patt_eq_expr_of_string loc (String.length "<let ") e in
-          let body = expr_of_expr_list loc el in
+          let body = expr_of_expr_list loc (strip el) in
           <:expr< let $p$ = $e$ in $body$ >>
       | e = FOR; el = LIST0 expr; E_FOR ->
           let (p, e) = patt_in_expr_of_string loc (String.length "<for ") e in
@@ -306,8 +376,8 @@ EXTEND
           <:expr< List.iter (fun $p$ -> $body$) $e$ >>
       | e = IF; el1 = LIST0 expr; ELSE; el2 = LIST0 expr; E_IF ->
           let e = expr_of_string loc (String.length "<if ") e in
-          let e1 = expr_of_expr_list loc el1 in
-          let e2 = expr_of_expr_list loc el2 in
+          let e1 = expr_of_expr_list loc (strip el1) in
+          let e2 = expr_of_expr_list loc (strip el2) in
           <:expr< if $e$ then $e1$ else $e2$ >>
       | e = IF; el1 = LIST0 expr; E_IF ->
           let e = expr_of_string loc (String.length "<if ") e in
@@ -353,7 +423,8 @@ EXTEND
       | t = ETAG -> <:expr< wprint $str:"</" ^ t ^ ">"$ >>
       | t = TEXT -> <:expr< wprint $str:t$ >>
       | t = TAG -> <:expr< wprint "<%s>" $str:t$ >>
-      | COMM; e = expr -> e ] ]
+      | COMM; e = expr -> e
+      | STRIP; el = LIST0 expr -> expr_of_expr_list loc (strip el) ] ]
   ;
   format_expr_list:
     [ [ IND; el = format_expr_list -> el
@@ -363,7 +434,7 @@ EXTEND
   match_case:
     [ [ p = WITH; el = LIST0 expr ->
           let (p, w) = patt_of_string loc (String.length "<with ") p in
-          let e = expr_of_expr_list loc el in
+          let e = expr_of_expr_list loc (strip (reindent el)) in
           (p, w, e)
       | _ = TEXT; c = match_case -> c
       | _ = IND; c = match_case -> c ] ]

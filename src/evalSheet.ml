@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: evalSheet.ml,v 1.1.2.9 1999-04-11 19:28:12 ddr Exp $ *)
+(* $Id: evalSheet.ml,v 1.1.2.10 1999-04-12 16:15:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -106,7 +106,7 @@ value setindent ind statl =
         Sformat e (List.map do_stat body)
     | Smatch e casel ->
         Smatch e (List.map do_match_case casel)
-    | Sxml (PXML.Xind ind0) as a ->
+    | Sxml (PXML.Xind ind0) ->
         let ind = max 0 (ind0 - ind) in
         Sxml (PXML.Xind ind)
     | x -> x ]
