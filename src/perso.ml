@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo q_MLast.cmo *)
-(* $Id: perso.ml,v 2.15.2.2 1999-04-09 06:36:39 ddr Exp $ *)
+(* $Id: perso.ml,v 2.15.2.3 1999-04-09 06:42:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -821,7 +821,7 @@ value print conf base p =
         {Eval.cval = Obj.repr (p : person);
          Eval.ctyp = <:ctyp< person >>})]
     in
-    InterpSheet.eval conf base env "perso";
+    EvalTempl.f conf base env "perso";
   return
   do header conf title;
      print_sosa_if_any conf base p;
