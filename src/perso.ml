@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.52.2.2 1999-10-23 13:21:46 ddr Exp $ *)
+(* $Id: perso.ml,v 2.52.2.3 1999-10-23 13:48:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -947,11 +947,11 @@ value print_occupation_dates conf base p =
     let opened = ref False in
     (fun () ->
        do if not opened.val then
-            do Wserver.wprint "<ul>\n"; opened.val := True; return ()
+            do Wserver.wprint "<td>\n<ul>\n"; opened.val := True; return ()
           else ();
           html_li conf;
        return (),
-     fun () -> if opened.val then Wserver.wprint "</ul>\n" else ())
+     fun () -> if opened.val then Wserver.wprint "</ul>\n</td>\n" else ())
   in
   do match sou base p.occupation with
      [ "" -> ()
@@ -1001,7 +1001,7 @@ value print_photo_dates_welcome conf base p =
                  (Util.code_varenv b) width height image_txt;
               end
           | _ -> () ];
-          tag "td" begin print_occupation_dates conf base p; end;
+          print_occupation_dates conf base p;
           tag "td" "valign=top" begin print_link_to_welcome conf True; end;
         end;
       end ]
