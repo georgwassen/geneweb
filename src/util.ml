@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.52.2.2 1999-10-22 15:38:58 ddr Exp $ *)
+(* $Id: util.ml,v 2.52.2.3 1999-10-23 04:50:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -578,6 +578,14 @@ value header_no_page_title conf title =
      Wserver.wprint "<body%s>" s;
      List.iter (fun t -> Wserver.wprint "<%s>" t) (enclosing_tags conf);
      Wserver.wprint "\n";
+  return ()
+;
+
+value cheader conf title =
+  do header_no_page_title conf title;
+     Wserver.wprint "<center><h1>";
+     title False;
+     Wserver.wprint "</h1></center>\n";
   return ()
 ;
 
