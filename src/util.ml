@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.52.2.7 1999-10-25 04:14:50 ddr Exp $ *)
+(* $Id: util.ml,v 2.52.2.8 1999-10-26 10:36:38 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -537,7 +537,8 @@ value fdecline conf w s =
   valid_format w (gen_decline conf (Obj.magic w : string) s)
 ;
 
-value std_color s = "<font color=green>" ^ s ^ "</font>";
+value green_color = "#2f6400";
+value std_color s = "<font color=" ^ green_color ^ ">" ^ s ^ "</font>";
 
 value index_of_sex =
   fun
@@ -577,7 +578,7 @@ value header_no_page_title conf title =
 
 value cheader conf title =
   do header_no_page_title conf title;
-     Wserver.wprint "<center><h1><font color=green>";
+     Wserver.wprint "<center><h1><font color=%s>" green_color;
      title False;
      Wserver.wprint "</font></h1></center>\n";
   return ()

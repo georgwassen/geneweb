@@ -15,7 +15,7 @@
 height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>{Genealogical<br>data base}</font></h1>
+<h1><font color=#2f6400>Genealogisk<br>database</font></h1>
 </td>
 </tr>
 </table>
@@ -60,7 +60,7 @@ personer.%o<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-{To navigate in this data base, you can do your search}:<br><br>
+For &aring; navigere i databasen, kan du s&oslash;ke:<br><br>
 
 <ul>
 
@@ -70,7 +70,7 @@ personer.%o<br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=#2f6400><b>{by person}</b></font>
+<font color=#2f6400><b>etter person</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -105,7 +105,7 @@ ex:
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>{by the list}</b></font> {of all}
+<font color=#2f6400><b>etter liste</b></font> av alle
 <select name=m>
 <option value="N" selected>etternavn
 <option value="P">fornavn
@@ -120,26 +120,26 @@ sortert
 
 <li>
 
-<font color=#2f6400><b>{by the}</b></font>
+<font color=#2f6400><b>gjennom</b></font>
 <a href="%sm=H;v=advanced"><font color=#2f6400><b>avansert
-s&oslash;k</b></font></a>.
+s&oslash;king</b></font></a>.
 
 </ul>
 
 %w<p>
 
-<center>{You can}<br><br>
+<center>Du kan<br><br>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
-<li><a href="%sm=ADD_FAM">{add a family}</a>
+<li><a href="%sm=ADD_FAM">legge til en familie</a>
 </ul>
 </td>
 <td align=left>
 <ul>
-<li><a href="%sm=MOD_NOTES">{modify the notes}</a>
+<li><a href="%sm=MOD_NOTES">endre notater</a>
 </ul>
 </td>
 </tr>
@@ -148,7 +148,7 @@ s&oslash;k</b></font></a>.
 <br>
 %w
 
-<center>{You can also consult}<br><br>
+<center>Du kan ogs&aring; sl&aring; opp i<br><br>
 
 <table border=0>
 <tr>
