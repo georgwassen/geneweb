@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.52.2.4 1999-10-23 13:21:49 ddr Exp $ *)
+(* $Id: util.ml,v 2.52.2.5 1999-10-24 13:56:19 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -545,6 +545,8 @@ value fdecline conf w s =
   valid_format w (gen_decline conf (Obj.magic w : string) s)
 ;
 
+value std_color s = "<font color=green>" ^ s ^ "</font>";
+
 value index_of_sex =
   fun
   [ Male -> 0
@@ -583,9 +585,23 @@ value header_no_page_title conf title =
 
 value cheader conf title =
   do header_no_page_title conf title;
-     Wserver.wprint "<center><h1>";
-     title False;
-     Wserver.wprint "</h1></center>\n";
+     tag "table" "border=%d width=\"100%%\"" conf.border begin
+       tag "tr" begin
+         if conf.cancel_links then ()
+         else
+           do Wserver.wprint "<td>\n";
+              Wserver.wprint "\
+<img src=\"%sm=IM;v=/gwlogo.gif\" width=48 height=54 align=left alt=GeneWeb>\n"
+             (commd conf);
+              Wserver.wprint "</td>\n";
+           return ();
+         Wserver.wprint "<td align=center>\n";
+         Wserver.wprint "<h1><font color=green>";
+         title False;
+         Wserver.wprint "</font></h1>\n";
+         Wserver.wprint "</td>\n";
+       end;
+     end;
   return ()
 ;
 

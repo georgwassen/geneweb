@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.29.2.1 1999-10-24 02:35:54 ddr Exp $ *)
+(* $Id: update.ml,v 2.29.2.2 1999-10-24 13:56:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -841,6 +841,16 @@ value print conf base p =
   let a = aoi base p.cle_index in
   do cheader conf title;
      tag "table" "border=%d width=\"95%%\"" conf.border begin
+       tag "tr" begin
+         tag "th" "align=left" begin
+           Wserver.wprint "%s<br>&nbsp;\n"
+             (std_color (capitale (transl_nth conf "person/persons" 0)));
+         end;
+         tag "th" "align=left" begin
+           Wserver.wprint "%s<br>&nbsp;\n"
+             (std_color (capitale (transl_nth conf "family/families" 1)));
+         end;
+       end;
        tag "tr" begin
          tag "td" "valign=top" begin
            Wserver.wprint "<a href=\"%sm=MOD_IND;i=%d\">%s</a><br>\n"

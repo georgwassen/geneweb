@@ -1,13 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 2.5.2.1 1999-10-24 02:35:54 ddr Exp $ *)
+(* $Id: birthday.ml,v 2.5.2.2 1999-10-24 13:56:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Config;
 open Util;
 open Gutil;
-
-value std_color s = "<font color=green>" ^ s ^ "</font>";
 
 type date_event = [ DeBirth | DeDeath of death_reason ];
 
@@ -258,9 +256,8 @@ value propose_months conf mode =
 ;
 
 value menu_print conf base =
-  let title h =
-    let s = capitale (transl conf "birthdays") in
-    Wserver.wprint "%s" (if not h then std_color s else s)
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "birthdays"))
   in
   do cheader conf title;
      let (tom_d, tom_m, tom_y) =
@@ -310,9 +307,8 @@ value print_anniv conf base day_name verb wd d m y list =
 ;
 
 value menu_print_dead conf base =
-  let title h =
-    let s = capitale (transl conf "anniversaries of dead") in
-    Wserver.wprint "%s" (if not h then std_color s else s)
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "anniversaries of dead"))
   in
   do cheader conf title;
      let (tom_d, tom_m, tom_y) =

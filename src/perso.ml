@@ -1,13 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.52.2.5 1999-10-24 07:46:31 ddr Exp $ *)
+(* $Id: perso.ml,v 2.52.2.6 1999-10-24 13:56:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 open Util;
 open Config;
-
-value std_color s = "<font color=green>" ^ s ^ "</font>";
 
 exception Ok;
 value has_grand_parents base p =
@@ -795,7 +793,7 @@ value print_sosa conf base open_area a =
 value print_compute_link conf base p mode text =
   Wserver.wprint "<a href=\"%s%s%s\"><b>%s</b></a>"
     (commd conf) (if mode <> "" then "m=" ^ mode ^ ";" else "")
-   (acces conf base p) (std_color (capitale text))
+    (acces conf base p) (std_color (capitale text))
 ;
 
 value print_linked_first_name_and_surname conf base p =
@@ -893,7 +891,7 @@ value print_sub_titles conf base p =
   return ()
 ;
 
-value max_image_width = 200;
+value max_image_width = 240;
 value max_image_height = 240;
 
 value limited_image_size conf fname =
@@ -1103,7 +1101,6 @@ value print conf base p =
               else ();
             end;
           end;
-          Wserver.wprint "<br>\n";
        return ();
      match p_getenv conf.env "opt" with
      [ Some "misc" ->
