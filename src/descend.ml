@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.31.2.3 1999-10-24 17:15:32 ddr Exp $ *)
+(* $Id: descend.ml,v 2.31.2.4 1999-10-25 05:16:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -39,8 +39,10 @@ value make_level_table base niveau_max p =
 ;
 
 value level_max base p =
+(*
   let _ = base.data.persons.array () in
   let _ = base.data.families.array () in
+*)
   let levt = make_level_table base infini p in
   let x = ref 0 in
   do for i = 0 to Array.length levt - 1 do
@@ -100,7 +102,7 @@ value print_choice conf base p niveau_effectif =
             (capitale (transl conf "list"));
           if browser_doesnt_have_tables conf then ()
           else
-            Wserver.wprint "<input type=radio name=t value=T> %s<br>\n"
+            Wserver.wprint "<input type=radio name=t value=T> %s\n"
               (capitale (transl conf "tree"));
             if niveau_effectif <= limit_by_tree then ()
             else
@@ -109,6 +111,7 @@ value print_choice conf base p niveau_effectif =
                    limit_by_tree;
                  Wserver.wprint ")\n";
               return ();
+          Wserver.wprint "<br>\n";
           Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
             (capitale (transl conf "only the generation selected"));
         end;
