@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: global.ml,v 1.1.2.1 1999-04-08 16:54:10 ddr Exp $ *)
+(* $Id: global.ml,v 1.1.2.2 1999-04-09 08:34:57 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -16,6 +16,12 @@ value table =
            (fun p -> Util.acces conf base p :
             person -> string),
        <:ctyp< person -> string >>));
+     ("age",
+      (fun conf base ->
+         Obj.repr
+           (fun d -> temps_ecoule d conf.today :
+            date -> date),
+       <:ctyp< date -> date >>));
      ("aliases",
       (fun conf base ->
          Obj.repr
@@ -83,6 +89,12 @@ value table =
            (Util.commd conf :
             string),
        <:ctyp< string>>));
+     ("day",
+      (fun conf base ->
+         Obj.repr
+           (fun d -> d.day :
+            date -> int),
+       <:ctyp< date -> int >>));
      ("death",
       (fun conf base ->
          Obj.repr

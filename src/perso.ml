@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo q_MLast.cmo *)
-(* $Id: perso.ml,v 2.15.2.3 1999-04-09 06:42:37 ddr Exp $ *)
+(* $Id: perso.ml,v 2.15.2.4 1999-04-09 08:34:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -820,10 +820,9 @@ value print conf base p =
       [("p",
         {Eval.cval = Obj.repr (p : person);
          Eval.ctyp = <:ctyp< person >>})]
-    in
-    EvalTempl.f conf base env "perso";
-  return
-  do header conf title;
+     in
+     EvalTempl.f conf base env "perso";
+     header conf title;
      print_sosa_if_any conf base p;
      print_link_to_welcome conf True;
      if age_autorise conf base p then

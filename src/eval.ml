@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: eval.ml,v 1.1.2.2 1999-04-08 21:18:22 ddr Exp $ *)
+(* $Id: eval.ml,v 1.1.2.3 1999-04-09 08:34:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -52,7 +52,7 @@ and print_type2 f =
 ;
 
 value error s err t =
-  do Printf.eprintf "*** while evaluating style sheet\n";
+  do Printf.eprintf "*** while evaluating template\n";
      Printf.eprintf "input: %s\n" s;
      Printf.eprintf "message: %s\n" err;
      match t with
@@ -295,6 +295,16 @@ do Printf.eprintf "... binding %s\n" s; flush stderr; return
         | (_, <:patt< DeadYoung >> | <:patt< DeadDontKnowWhen >>) -> None
         | (_, <:patt< DontKnowIfDead >>) -> None
         | _ -> eval_err "matching a death type with incompatible pattern" ]
+    | (<:ctyp< death_reason >>, p) ->
+       match ((Obj.magic v : death_reason), p) with
+       [ (Unspecified, <:patt< Unspecified >>) -> Some []
+       | (Murdered, <:patt< Murdered >>) -> Some []
+       | (Killed, <:patt< Killed >>) -> Some []
+       | (Executed, <:patt< Executed >>) -> Some []
+       | (_, <:patt< Unspecified >> | <:patt< Murdered >>) -> None
+       | (_, <:patt< Killed >> | <:patt< Executed >>) -> None
+       | _ ->
+           eval_err "matching a death_reason type with incompatible pattern" ]
     | (<:ctyp< int >>, <:patt< $int:s$ >>) ->
         if (Obj.magic v : int) = int_of_string s then Some [] else None
     | ((<:ctyp< list $t$ >> as tl), p) ->
@@ -345,7 +355,7 @@ value eval_matching global env d (p, w) =
 value wrap s f =
   try f () with
   [ Stdpp.Exc_located loc (Stream.Error err) ->
-      do Printf.eprintf "*** Error while parsing style sheet\n";
+      do Printf.eprintf "*** Error while parsing template\n";
          Printf.eprintf "input: %s\n" s;
          Printf.eprintf "at location: (%d, %d)\n" (fst loc) (snd loc);
          Printf.eprintf "message: %s\n" err;

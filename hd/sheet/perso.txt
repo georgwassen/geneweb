@@ -1,4 +1,4 @@
-<comm e="$Id: perso.txt,v 1.1.2.3 1999-04-09 05:00:12 ddr Exp $">
+<comm e="$Id: perso.txt,v 1.1.2.4 1999-04-09 08:34:55 ddr Exp $">
 <comm e="Copyright (c) 1999 INRIA">
 <comm
   Context:
@@ -181,7 +181,35 @@
   </match>
 </if>
 
-<em>Dates to complete...</em><br>
+<match death p>
+<with Death dr d>
+  <em>
+  <match dr>
+  <with Unspecified><eval transl_nth "Died" (sex p)>
+  <with Murdered><eval transl_nth "Murdered" (sex p)>
+  <with Killed><eval transl_nth "Killed (in action)" (sex p)>
+  <with Executed><eval transl_nth "Executed (legally killed)" (sex p)>
+  <with Disappeared><eval transl_nth "Disappeared" (sex p)>
+  </match>
+  <if death_place p != ""><eval ondate d> - <eval death_place p>.
+  <else><eval ondate d>.
+  </if>
+  </em><br>
+</match>
+
+<match (birth_date p, death p)>
+<with (Some d, NotDead)>
+  <if day d = 0 AND month d = 0 AND precision d != Sure>
+  <else>
+    <em><eval transl "Age">:
+    <match (age d)>
+    <with (0, 0, 0)><eval transl "birth">
+    <with (0, 0, 1)><eval transl "one year old">
+    <with (_, _, y)><eval y> <eval transl "years old">
+    </match>.</em><br>
+  </if>
+</match>
+
 <em>Consanguinity to display...</em><br>
 
 <match parents p>
