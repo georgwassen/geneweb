@@ -1,5 +1,5 @@
 <comm param = p>
-<comm $Id: s_perso.txt,v 1.1.2.2 1999-04-11 19:28:12 ddr Exp $>
+<comm $Id: s_perso.txt,v 1.1.2.3 1999-04-13 15:03:54 ddr Exp $>
 <comm Copyright (c) 1999 INRIA>
 <comm
   Context:
@@ -77,7 +77,7 @@
     <with None>
     </match>
   <with s>
-  <if string_length s GT string_length "http://" AND
+    <if string_length s GT string_length "http://" AND
         string_sub s 0 (string_length "http://") = "http://">
       <img src=s alt="`transl \"image\"`">
       <p>
