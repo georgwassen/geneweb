@@ -35,10 +35,10 @@ Databasen <font color=#2f6400><b>"%t"</b></font> indeholder for
 <tr>
 
 <td align=center><a href="%sw=w"><em>Opdaterings</em></a> adgang<br>
-(password)</td>
+(adgangsord)</td>
 
 %y%z<td align=center><a href="%sw=f"><em>Betroet</em></a> adgang<br>
-(password)</td>
+(adgangsord)</td>
 
 %z%y</tr></table>
 
@@ -47,7 +47,7 @@ Databasen <font color=#2f6400><b>"%t"</b></font> indeholder for
 <table border=0>
 <tr><td align=center>
 <form method=get action="%f">
-%hPassword, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
+%hAdgangsord, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
 <input name=w size=10 maxlength=200>
 </form>
 </td></tr>
@@ -89,20 +89,21 @@ eller <em>Sosa-nummer</em>, refererende til %a%u
 %h<input type=hidden name=m value=TT>
 <font color=#2f6400><b>adelstitel</b></font>
 <input name=t size=14 maxlength=200>
-<font color=#2f6400><b>og/eller -navn</b></font>
+<font color=#2f6400><b>og/eller adelsnavn</b></font>
 <input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
 <br>
-ex:
-<font color=#2f6400><b>adelstitel</b></font>: roi, duke...
-<font color=#2f6400><b>og/eller -navn</b></font>: de France, of Sax...
+Eks:
+<font color=#2f6400><b>adelstitel</b></font>: adelsmand, greve, konge...
+<font color=#2f6400><b>og/eller adelsnavn</b></font>: von Klingenberg,
+Griffenfeld, af Danmark...
 </form>
 
 <li>
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>i listen</b></font> over alle
+<font color=#2f6400><b>i liste</b></font> over alle
 <select name=m>
 <option value="N" selected>efternavne
 <option value="P">fornavne
