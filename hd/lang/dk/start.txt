@@ -14,7 +14,7 @@
 height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=green>{Genealogical<br>data base}</font></h1>
+<h1><font color=green>Genealogisk<br>database</font></h1>
 </td>
 </tr>
 </table>
@@ -47,7 +47,7 @@ Databasen <font color=green><b>"%t"</b></font> indeholder for
 <table border=0>
 <tr><td align=center>
 <form method=get action="%f">
-%h{Password, for <em>friend</em> or <em>wizard</em> access}</em>:
+%hPassword, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
 <input name=w size=10 maxlength=200>
 </form>
 </td></tr>
@@ -59,7 +59,7 @@ Databasen <font color=green><b>"%t"</b></font> indeholder for
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-{To navigate in this data base, you can do your search}:<br><br>
+For at navigere i denne database, kan du søge:<br><br>
 
 <ul>
 
@@ -67,7 +67,7 @@ Databasen <font color=green><b>"%t"</b></font> indeholder for
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=green><b>{by person}</b></font>
+<font color=green><b>personnavn</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -87,22 +87,22 @@ eller <em>Sosa-nummer</em>, refererende til %a%u
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-<font color=green><b>{by} adelstitel</b></font>
+<font color=green><b>adelstitel</b></font>
 <input name=t size=14 maxlength=200>
-<font color=green><b>navn</b></font>
+<font color=green><b>og/eller -navn</b></font>
 <input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
 <br>
 ex:
 <font color=green><b>adelstitel</b></font>: roi, duke...
-<font color=green><b>navn</b></font>: de France, of Sax...
+<font color=green><b>og/eller -navn</b></font>: de France, of Sax...
 </form>
 
 <li>
 
 <form method=GET action="%f">
 %h
-<font color=green><b>{by the list}</b></font> {of all}
+<font color=green><b>i listen</b></font> over alle
 <select name=m>
 <option value="N" selected>efternavne
 <option value="P">fornavne
@@ -116,7 +116,7 @@ sorteret efter
 </form>
 
 <li>
-<font color=green><b>{by the}</b></font>
+<font color=green><b>ved</b></font>
 <a href="%sm=H;v=advanced"><font color=green><b>avanceret
 søgning</b></font></a>.
 
@@ -124,18 +124,18 @@ søgning</b></font></a>.
 
 %w<p>
 
-<center>{You can}<br><br>
+<center>Du kan<br><br>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
-<li><a href="%sm=ADD_FAM">{add a family}</a>
+<li><a href="%sm=ADD_FAM">tilføje en familie</a>
 </ul>
 </td>
 <td align=left>
 <ul>
-<li><a href="%sm=MOD_NOTES">{modify the notes}</a>
+<li><a href="%sm=MOD_NOTES">ændre noterne</a>
 </ul>
 </td>
 </tr>
@@ -144,25 +144,25 @@ søgning</b></font></a>.
 <br>
 %w
 
-<center>{You can also consult}<br><br>
+<center>Du kan også fremkalde<br><br>
 
 <table border=0>
 <tr>
 <td valign=up>
 <ul>
-<li>{the} <a href="%sm=AN">&aring;rsdage for f&oslash;dsler</a>
-<li>{the} <a href="%sm=AD">&aring;rsdage for d&oslash;de personer</a>
-<li>{the} <a href="%sm=AM">&aring;rsdage for bryllupper</a>%x
-<li>{the} <a href="%sm=LB;k=10">seneste f&oslash;dsler</a>%x
+<li><a href="%sm=AN">&aring;rsdage for f&oslash;dsler</a>
+<li><a href="%sm=AD">&aring;rsdage for d&oslash;de personer</a>
+<li><a href="%sm=AM">&aring;rsdage for bryllupper</a>%x
+<li><a href="%sm=LB;k=10">seneste f&oslash;dsler</a>%x
 </ul>
 </td>
 <td valign=up>
 <ul>%x
-<li>{the} <a href="%sm=LD;k=10">seneste d&oslash;dsfald</a>%x%j
-<li>{the} <a href="%sm=HIST;k=10">opdateringers historie</a>%j
-<li>{the} <a href="%sm=CAL">kalendere</a>
-<li>{the <a href="%sm=FORUM"><font color=green><b>GeneWeb</b></font>
-forum</a>}
+<li><a href="%sm=LD;k=10">seneste d&oslash;dsfald</a>%x%j
+<li><a href="%sm=HIST;k=10">opdateringers historie</a>%j
+<li><a href="%sm=CAL">kalendere</a>
+<li><a href="%sm=FORUM"><font color=green><b>GeneWeb</b></font>
+forum</a>
 </ul>
 </td>
 </tr>
