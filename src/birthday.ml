@@ -1,11 +1,13 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 2.5 1999-09-16 09:31:40 ddr Exp $ *)
+(* $Id: birthday.ml,v 2.5.2.1 1999-10-24 02:35:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Config;
 open Util;
 open Gutil;
+
+value std_color s = "<font color=green>" ^ s ^ "</font>";
 
 type date_event = [ DeBirth | DeDeath of death_reason ];
 
@@ -227,33 +229,40 @@ value print_birth_day conf base day_name verb wd d m y list =
         (capitale (transl conf "no birthday")) day_name
   | _ ->
       let dt = {day = d; month = m; year = y; prec = Sure; delta = 0} in
-      do Wserver.wprint "%s, %s %s%s %s %s:\n"
-           (capitale day_name) (transl_nth conf "(week day)" wd)
-           (Date.string_of_date conf (Dgreg dt Dgregorian)) verb
-           (transl conf "the birthday")
+      do Wserver.wprint "%s, %s%s %s %s:\n"
+           (capitale day_name)
+           (std_color
+              ("<b>" ^ transl_nth conf "(week day)" wd ^ " " ^
+                 Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
+           verb (transl conf "the birthday")
            (transl_decline conf "of" "");
          afficher_liste_anniversaires conf base False dt list;
       return () ]
 ;
 
 value propose_months conf mode =
-  tag "form" "method=get action=\"%s\"" conf.command begin
-    Srcfile.hidden_env conf;
-    Wserver.wprint "<input type=hidden name=m value=%s>\n" mode;
-    tag "select" "name=v" begin
-      for i = 1 to 12 do
-        Wserver.wprint "<option value=%d%s>%s\n" i
-          (if i = conf.today.month then " selected" else "")
-          (capitale (transl_nth conf "(month)" (i - 1)));
-      done;
+  tag "center" begin
+    tag "form" "method=get action=\"%s\"" conf.command begin
+      Srcfile.hidden_env conf;
+      Wserver.wprint "<input type=hidden name=m value=%s>\n" mode;
+      tag "select" "name=v" begin
+        for i = 1 to 12 do
+          Wserver.wprint "<option value=%d%s>%s\n" i
+            (if i = conf.today.month then " selected" else "")
+            (capitale (transl_nth conf "(month)" (i - 1)));
+        done;
+      end;
+      Wserver.wprint "<input type=submit value=\"Ok\">\n";
     end;
-    Wserver.wprint "<input type=submit value=\"Ok\">\n";
   end
 ;
 
 value menu_print conf base =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "birthdays")) in
-  do header conf title;
+  let title h =
+    let s = capitale (transl conf "birthdays") in
+    Wserver.wprint "%s" (if not h then std_color s else s)
+  in
+  do cheader conf title;
      let (tom_d, tom_m, tom_y) =
        lendemain (conf.today.day, conf.today.month, conf.today.year)
      in
@@ -290,19 +299,22 @@ value print_anniv conf base day_name verb wd d m y list =
         (capitale (transl conf "no anniversary")) day_name
   | _ ->
       let dt = {day = d; month = m; year = y; prec = Sure; delta = 0} in
-      do Wserver.wprint "%s, %s %s%s %s:"
-           (capitale day_name) (transl_nth conf "(week day)" wd)
-           (Date.string_of_date conf (Dgreg dt Dgregorian)) verb
-           (transl conf "the anniversary");
+      do Wserver.wprint "%s, %s%s %s:"
+           (capitale day_name)
+           (std_color
+              ("<b>" ^ transl_nth conf "(week day)" wd ^ " " ^
+                 Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
+           verb (transl conf "the anniversary");
          afficher_liste_anniversaires conf base True dt list;
       return () ]
 ;
 
 value menu_print_dead conf base =
-  let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "anniversaries of dead"))
+  let title h =
+    let s = capitale (transl conf "anniversaries of dead") in
+    Wserver.wprint "%s" (if not h then std_color s else s)
   in
-  do header conf title;
+  do cheader conf title;
      let (tom_d, tom_m, tom_y) =
        lendemain (conf.today.day, conf.today.month, conf.today.year)
      in
