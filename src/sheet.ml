@@ -10,6 +10,7 @@ value perso_print conf base p =
       {Eval.cval = Obj.repr (p : person); Eval.ctyp = <:ctyp< person >>})]
   in
   do EvalSheet.f conf base env "s_perso";
+     Wserver.wprint "\n\n<p><hr width=80%%><p>\n\n";
      Perso.print conf base p;
   return ()
 ;
@@ -43,6 +44,7 @@ value relation_print conf base p =
               Eval.ctyp = <:ctyp< person >>})]
           in
           do EvalSheet.f conf base env "s_relation";
+             Wserver.wprint "\n\n<p><hr width=80%%a><p>\n\n";
              Relation.print_main_relationship conf base p1 p rel;
           return ()
       | None -> Relation.print_base_loop conf base ]

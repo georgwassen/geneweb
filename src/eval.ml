@@ -1,8 +1,10 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: eval.ml,v 1.1.2.8 1999-04-11 19:28:12 ddr Exp $ *)
+(* $Id: eval.ml,v 1.1.2.9 1999-04-15 00:57:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type dyn = { cval : Obj.t; ctyp : MLast.ctyp };
+
+value templ_file_name = ref "";
 
 exception EvalError of string and option MLast.ctyp;
 value eval_err s = raise (EvalError s None);
@@ -49,18 +51,64 @@ and print_type2 f =
   | x -> not_impl "print_type2" x ]
 ;
 
+value init_err () = Wserver.wprint "></a></title></strong></em>\n<p><p>\n";
+value print_err s = do Wserver.wprint "%s" s; Printf.eprintf "%s" s; return ();
+value print_err_nl () =
+  do Wserver.wprint "<br>\n"; Printf.eprintf "\n"; return ()
+;
+value flush_err () = do Wserver.wprint "<p><p>"; flush stderr; return ();
+
 value error s err t =
-  do Printf.eprintf "*** while evaluating style sheet\n";
-     Printf.eprintf "input: %s\n" s;
-     Printf.eprintf "message: %s\n" err;
+  do Wserver.wprint "\"";
+     init_err ();
+     print_err "*** Error while evaluating template";
+     if templ_file_name.val <> "" then
+       do print_err " \"";
+          print_err templ_file_name.val;
+          print_err "\"";
+       return ()
+     else ();
+     print_err_nl ();
+     print_err "input: ";
+     print_err s;
+     print_err_nl ();
+     print_err "message: ";
+     print_err err;
+     print_err_nl ();
      match t with
      [ Some t ->
-         do Printf.eprintf "type: ";
-            print_type (fun x -> Printf.eprintf "%s" x) t;
-            Printf.eprintf "\n";
+         do print_err "type: ";
+            print_type print_err t;
+            print_err_nl ();
          return ()
      | None -> () ];
-     flush stderr;
+     flush_err ();
+  return raise Exit
+;
+
+value parse_error loc s err =
+  do init_err ();
+     print_err "*** Error while parsing in template";
+     if templ_file_name.val <> "" then
+       do print_err " \"";
+          print_err templ_file_name.val;
+          print_err "\"";
+       return ()
+     else ();
+     print_err_nl ();
+     print_err "input: ";
+     print_err s;
+     print_err_nl ();
+     print_err "at location: (";
+     print_err (string_of_int (fst loc));
+     print_err ", ";
+     print_err (string_of_int (snd loc));
+     print_err ")";
+     print_err_nl ();
+     print_err "message: ";
+     print_err err;
+     print_err_nl ();
+     flush_err ();
   return raise Exit
 ;
 
@@ -272,7 +320,7 @@ do Printf.eprintf "... binding %s\n" s; flush stderr; return
 *)
         Some [(s, {cval = v; ctyp = t})]
     | (t, <:patt< _ >>) -> Some []
-    | (<:ctyp< ($list:tl$) >>, <:patt< ($list:pl$) >>) ->
+    | ((<:ctyp< ($list:tl$) >> as t), <:patt< ($list:pl$) >>) ->
         let v = Array.to_list (Obj.magic v) in
         loop (Some [], v, tl, pl) where rec loop =
           fun
@@ -281,22 +329,22 @@ do Printf.eprintf "... binding %s\n" s; flush stderr; return
               [ Some env1 -> loop (Some (env1 @ env), vl, tl, pl)
               | None -> None ]
           | (envo, [], [], []) -> envo
-          | _ -> None ]
+          | _ -> type_err t "pattern and expression have incompatible types" ]
     | (<:ctyp< death >>, p) ->
-        match ((Obj.magic v : Def.death), p) with
-        [ (Def.NotDead, <:patt< NotDead >>) -> Some []
-        | (Def.Death dr dd, <:patt< Death $p1$ $p2$ >>) ->
+        match ((Obj.magic v : GlobDef.death), p) with
+        [ (GlobDef.NotDead, <:patt< NotDead >>) -> Some []
+        | (GlobDef.Death dr dd, <:patt< Death $p1$ $p2$ >>) ->
             match
               (matching (Obj.repr (dr : Def.death_reason))
                  (<:ctyp< death_reason >>, p1),
-               matching (Obj.repr (Adef.date_of_cdate dd : Adef.date))
+               matching (Obj.repr (*Adef.date_of_cdate*) (dd : Adef.date))
                  (<:ctyp< date >>, p2))
             with
             [ (Some env1, Some env2) -> Some (env1 @ env2)
             | _ -> None ]
-        | (Def.DeadYoung, <:patt< DeadYoung >>) -> Some []
-        | (Def.DeadDontKnowWhen, <:patt< DeadDontKnowWhen >>) -> Some []
-        | (Def.DontKnowIfDead, <:patt< DontKnowIfDead >>) -> Some []
+        | (GlobDef.DeadYoung, <:patt< DeadYoung >>) -> Some []
+        | (GlobDef.DeadDontKnowWhen, <:patt< DeadDontKnowWhen >>) -> Some []
+        | (GlobDef.DontKnowIfDead, <:patt< DontKnowIfDead >>) -> Some []
         | (_, <:patt< NotDead >> | <:patt< Death $_$ $_$ >>) -> None
         | (_, <:patt< DeadYoung >> | <:patt< DeadDontKnowWhen >>) -> None
         | (_, <:patt< DontKnowIfDead >>) -> None
@@ -314,12 +362,12 @@ do Printf.eprintf "... binding %s\n" s; flush stderr; return
         | _ ->
             eval_err "matching a death_reason type with incompatible pattern" ]
     | (<:ctyp< burial >>, p) ->
-        match ((Obj.magic v : Def.burial), p) with
-        [ (Def.Buried d, <:patt< Buried $p$ >>) ->
-            matching (Obj.repr (Adef.od_of_codate d : option Adef.date))
+        match ((Obj.magic v : GlobDef.burial), p) with
+        [ (GlobDef.Buried d, <:patt< Buried $p$ >>) ->
+            matching (Obj.repr ((*Adef.od_of_codate*) d : option Adef.date))
               (<:ctyp< option date >>, p)
-        | (Def.Cremated d, <:patt< Cremated $p$ >>) ->
-            matching (Obj.repr (Adef.od_of_codate d : option Adef.date))
+        | (GlobDef.Cremated d, <:patt< Cremated $p$ >>) ->
+            matching (Obj.repr ((*Adef.od_of_codate*) d : option Adef.date))
               (<:ctyp< option date >>, p)
         | (_, <:patt< Buried $_$ >> | <:patt< Cremated $_$ >>) -> None
         | _ -> eval_err "matching a burial type with incompatible pattern" ]
@@ -370,34 +418,28 @@ value eval_matching global env d (p, w) =
   | None -> None ]
 ;
 
-value wrap s f =
+value try_with s f =
   try f () with
-  [ Stdpp.Exc_located loc (Stream.Error err) ->
-      do Printf.eprintf "*** Error while parsing style sheet\n";
-         Printf.eprintf "input: %s\n" s;
-         Printf.eprintf "at location: (%d, %d)\n" (fst loc) (snd loc);
-         Printf.eprintf "message: %s\n" err;
-         flush stderr;
-      return raise Exit
+  [ Stdpp.Exc_located loc (Stream.Error err) -> parse_error loc s err
   | EvalError err t -> error s err t ]
 ;
 
 value expr global env s =
-  wrap s
+  try_with s
     (fun () ->
        let ast = G.Entry.parse expr_eoi (G.parsable (Stream.of_string s)) in
        eval_expr global env ast)
 ;
 
 value matching global env v s =
-  wrap s
+  try_with s
     (fun () ->
        let ast = G.Entry.parse patt_eoi (G.parsable (Stream.of_string s)) in
        eval_matching global env v ast)
 ;
 
 value patt_in_expr global env s =
-  wrap s
+  try_with s
     (fun () ->
        let (id, ast) =
          G.Entry.parse patt_in_expr_eoi (G.parsable (Stream.of_string s))
@@ -406,7 +448,7 @@ value patt_in_expr global env s =
 ;
 
 value patt_eq_expr global env s =
-  wrap s
+  try_with s
     (fun () ->
        let (id, ast) =
          G.Entry.parse patt_eq_expr_eoi (G.parsable (Stream.of_string s))
@@ -415,7 +457,7 @@ value patt_eq_expr global env s =
 ;
 
 value simple_expr_list s =
-  wrap s
+  try_with s
     (fun () ->
        G.Entry.parse simple_expr_list_eoi (G.parsable (Stream.of_string s)))
 ;

@@ -1,5 +1,5 @@
 <comm param = p1,p2,result>
-<comm e="$Id: s_relation.txt,v 1.1.2.2 1999-04-11 19:28:12 ddr Exp $">
+<comm e="$Id: s_relation.txt,v 1.1.2.3 1999-04-15 00:57:08 ddr Exp $">
 <comm e="Copyright (c) 1999 INRIA">
 <comm
   Context:
@@ -130,5 +130,3 @@
 </match>
 
 </body>
-
-<p><hr width=80%><p>

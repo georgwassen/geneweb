@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_sheet.ml,v 1.1.2.5 1999-04-13 05:27:59 ddr Exp $ *)
+(* $Id: pa_sheet.ml,v 1.1.2.6 1999-04-15 00:57:09 ddr Exp $ *)
 
 value token_of_xast =
   fun
@@ -305,6 +305,11 @@ value adjust_sequence =
   sequence []
 ;
 
+value wprint_str loc s =
+  if String.contains s '%' then <:expr< wprint "%s" $str:s$ >>
+  else <:expr< wprint $str:s$ >>
+;
+
 value print_with_antiquot loc sh s =
   eval 0 0 where rec eval i0 i =
     if i < String.length s then
@@ -312,7 +317,7 @@ value print_with_antiquot loc sh s =
         let el1 =
           if i > i0 then
             let ss = String.sub s i0 (i - i0) in
-            [<:expr< wprint "%s" $str:ss$ >>]
+            [wprint_str loc ss]
           else []
         in
         if i + 1 == String.length s then el1
@@ -327,7 +332,7 @@ value print_with_antiquot loc sh s =
       else eval i0 (i + 1)
     else if i > i0 then
       let ss = String.sub s i0 (i - i0) in
-      [<:expr< wprint "%s" $str:ss$ >>]
+      [wprint_str loc ss]
     else []
 ;
 
@@ -478,7 +483,7 @@ EXTEND
       | i = IND -> <:expr< indent $int:i$ >>
       | t = ETAG -> <:expr< wprint $str:"</" ^ t ^ ">"$ >>
       | t = TEXT -> <:expr< wprint $str:t$ >>
-      | t = TAG -> <:expr< wprint "<%s>" $str:t$ >>
+      | t = TAG -> wprint_str loc ("<" ^ t ^ ">")
       | COMM; e = expr -> e ] ]
   ;
   sequence:
