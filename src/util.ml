@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.52.2.5 1999-10-24 13:56:19 ddr Exp $ *)
+(* $Id: util.ml,v 2.52.2.6 1999-10-24 16:25:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -585,23 +585,9 @@ value header_no_page_title conf title =
 
 value cheader conf title =
   do header_no_page_title conf title;
-     tag "table" "border=%d width=\"100%%\"" conf.border begin
-       tag "tr" begin
-         if conf.cancel_links then ()
-         else
-           do Wserver.wprint "<td>\n";
-              Wserver.wprint "\
-<img src=\"%sm=IM;v=/gwlogo.gif\" width=48 height=54 align=left alt=GeneWeb>\n"
-             (commd conf);
-              Wserver.wprint "</td>\n";
-           return ();
-         Wserver.wprint "<td align=center>\n";
-         Wserver.wprint "<h1><font color=green>";
-         title False;
-         Wserver.wprint "</font></h1>\n";
-         Wserver.wprint "</td>\n";
-       end;
-     end;
+     Wserver.wprint "<center><h1><font color=green>";
+     title False;
+     Wserver.wprint "</font></h1></center>\n";
   return ()
 ;
 
@@ -730,14 +716,19 @@ value copy_string_with_macros conf s =
     else ()
 ;
 
-value trailer conf =
+value gen_trailer with_logo conf =
   let env =
     [('s', commd conf);
      ('d',
       if conf.cancel_links then ""
       else " - <a href=\"" ^ commd conf ^ "m=DOC\">DOC</a>")]
   in
-  do try copy_etc_file env "copyr" with
+  do if not with_logo then ()
+     else
+        Wserver.wprint "<p>
+<img width=64 height=72 src=\"%s?m=IM;v=/gwlogo.gif\" align=right>\n<br>\n"
+          conf.command;
+     try copy_etc_file env "copyr" with
      [ Sys_error _ ->
          do html_p conf;
             Wserver.wprint "
@@ -763,6 +754,8 @@ GeneWeb %s</em></font>" Version.txt;
      Wserver.wprint "</body>\n";
   return ()
 ;
+
+value trailer = gen_trailer True;
 
 value menu_threshold = 20;
 

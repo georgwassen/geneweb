@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.20.2.1 1999-10-21 21:07:04 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.20.2.2 1999-10-24 16:25:24 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -256,7 +256,7 @@ and copy_from_file conf base name =
       return () ]
 ;
 
-value print conf base fname =
+value gen_print with_logo conf base fname =
   match
     try Some (open_in (lang_file_name conf fname)) with
     [ Sys_error _ ->
@@ -266,7 +266,7 @@ value print conf base fname =
   [ Some ic ->
       do Util.html conf;
          copy_from_channel conf base ic;
-         Util.trailer conf;
+         Util.gen_trailer with_logo conf;
       return ()
   | _ ->
       let title _ = Wserver.wprint "Error" in
@@ -275,9 +275,11 @@ value print conf base fname =
            html_li conf;
            Wserver.wprint "Cannot access file \"%s.txt\".\n" fname;
          end;
-         Util.trailer conf;
+         Util.gen_trailer with_logo conf;
       return raise Exit ]
 ;
+
+value print = gen_print True;
 
 value print_start conf base =
   let fname =
@@ -285,7 +287,7 @@ value print_start conf base =
     else if Sys.file_exists (any_lang_file_name conf.bname) then conf.bname
     else "start"
   in
-  print conf base fname
+  gen_print False conf base fname
 ;
 
 value print_lexicon conf base =

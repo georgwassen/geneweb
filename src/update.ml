@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.29.2.2 1999-10-24 13:56:18 ddr Exp $ *)
+(* $Id: update.ml,v 2.29.2.3 1999-10-24 16:25:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -881,19 +881,10 @@ value print conf base p =
            begin
              Wserver.wprint "%s" (capitale (transl_decline conf "merge" ""));
            end;
-           Wserver.wprint "<br>\n";
-         end;
-         tag "td" "valign=top" begin
-           print_family_stuff conf base p a;
-         end;
-       end;
-       tag "tr" begin
-	 tag "td" begin
      	   match a.parents with
-     	   [ Some _ -> Wserver.wprint "&nbsp;\n"
+     	   [ Some _ -> ()
      	   | None ->
-     	       if p_first_name base p = "?" || p_surname base p = "?" then
-                 Wserver.wprint "&nbsp;\n"
+     	       if p_first_name base p = "?" || p_surname base p = "?" then ()
      	       else
                  let s = transl conf "parents" in              
      		 do Wserver.wprint "<br>\n";
@@ -902,7 +893,8 @@ value print conf base p =
                       (capitale (transl_decline conf "add" s));
                  return () ];
          end;
-         tag "td" begin
+         tag "td" "valign=top" begin
+           print_family_stuff conf base p a;
            if has_children base p then
              do Wserver.wprint "<br>\n";
                 stag "a" "href=\"%sm=CHG_CHN;i=%d\"" (commd conf)
@@ -913,7 +905,7 @@ value print conf base p =
 	        end;
 	        Wserver.wprint "<br>\n";
              return ()
-           else Wserver.wprint "&nbsp;\n";
+           else ();
          end;
        end;
      end;

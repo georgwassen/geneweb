@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 2.5.2.2 1999-10-24 13:56:13 ddr Exp $ *)
+(* $Id: birthday.ml,v 2.5.2.3 1999-10-24 16:25:24 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -231,7 +231,7 @@ value print_birth_day conf base day_name verb wd d m y list =
            (capitale day_name)
            (std_color
               ("<b>" ^ transl_nth conf "(week day)" wd ^ " " ^
-                 Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
+               Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
            verb (transl conf "the birthday")
            (transl_decline conf "of" "");
          afficher_liste_anniversaires conf base False dt list;
@@ -377,8 +377,7 @@ value print_marriage conf base month =
                       html_li conf;
                       afficher_personne_titre_referencee conf base
                         (poi base fam.father);
-                      html_br conf;
-                      Wserver.wprint "%s\n" (transl conf "and");
+                      Wserver.wprint "\n%s\n" (transl conf "and");
                       afficher_personne_titre_referencee conf base
                         (poi base fam.mother);
                       Wserver.wprint ", <em>%s %d</em>\n"
@@ -421,8 +420,7 @@ value print_anniversaries_of_marriage conf base y list =
              html_li conf;
              afficher_personne_titre_referencee conf base
                (poi base fam.father);
-             html_br conf;
-             Wserver.wprint "%s\n" (transl conf "and");
+             Wserver.wprint "\n%s\n" (transl conf "and");
              afficher_personne_titre_referencee conf base
                (poi base fam.mother);
              Wserver.wprint ", <em>%s %d\n("
@@ -444,10 +442,12 @@ value print_marriage_day conf base day_name verb wd d m y list =
         (capitale (transl conf "no anniversary")) day_name
   | _ ->
       let dt = {day = d; month = m; year = y; prec = Sure; delta = 0} in
-      do Wserver.wprint "%s, %s %s%s %s %s:\n"
-           (capitale day_name) (transl_nth conf "(week day)" wd)
-           (Date.string_of_date conf (Dgreg dt Dgregorian)) verb
-           (transl conf "the anniversary of marriage")
+      do Wserver.wprint "%s, %s%s %s %s:\n"
+           (capitale day_name)
+           (std_color
+              ("<b>" ^ transl_nth conf "(week day)" wd ^ " " ^
+               Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
+           verb (transl conf "the anniversary of marriage")
            (transl_decline conf "of" "");
          print_anniversaries_of_marriage conf base y list;
       return () ]
@@ -457,7 +457,7 @@ value print_menu_marriage conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "anniversaries of marriage"))
   in
-  do header conf title;
+  do cheader conf title;
      let (tom_d, tom_m, tom_y) =
        lendemain (conf.today.day, conf.today.month, conf.today.year)
      in
