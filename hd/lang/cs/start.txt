@@ -15,7 +15,7 @@
 height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=green>{Genealogical<br>data base}</font></h1>
+<h1><font color=#2f6400>{Genealogical<br>data base}</font></h1>
 </td>
 </tr>
 </table>
@@ -26,7 +26,7 @@ height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-Databáze <font color=green><b>"%t"</b></font> nyní obsahuje %n osob.%o<br>
+Databáze <font color=#2f6400><b>"%t"</b></font> nyní obsahuje %n osob.%o<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%o
 
 %y<br><p>
@@ -69,7 +69,7 @@ Databáze <font color=green><b>"%t"</b></font> nyní obsahuje %n osob.%o<br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=green><b>{by person}</b></font>
+<font color=#2f6400><b>{by person}</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -89,22 +89,22 @@ Databáze <font color=green><b>"%t"</b></font> nyní obsahuje %n osob.%o<br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-<font color=green><b>podle titulu</b></font>
+<font color=#2f6400><b>podle titulu</b></font>
 <input name=t size=14 maxlength=200>
-<font color=green><b>místa</b></font>
+<font color=#2f6400><b>místa</b></font>
 <input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
 <br>
 ex:
-<font color=green><b>[title/titles]</b></font>: roi, duke...
-<font color=green><b>[place]</b></font>: de France, of Sax...
+<font color=#2f6400><b>[title/titles]</b></font>: roi, duke...
+<font color=#2f6400><b>[place]</b></font>: de France, of Sax...
 </form>
 
 <li>
 
 <form method=GET action="%f">
 %h
-<font color=green><b>{by the list}</b></font> {of all}
+<font color=#2f6400><b>{by the list}</b></font> {of all}
 <select name=m>
 <option value="N" selected>pøíjmení
 <option value="P">køestní jména
@@ -117,8 +117,8 @@ seøazená podle
 <input type=submit VALUE="Ok">
 </form>
 
-<li><font color=green><b>{by the}</b></font>
-<a href="%sm=H;v=advanced"><font color=green><b>pokroèilý
+<li><font color=#2f6400><b>{by the}</b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>pokroèilý
 dotaz</b></font></a>.
 
 </ul>
@@ -162,7 +162,7 @@ dotaz</b></font></a>.
 <li>{the} <a href="%sm=LD;k=10">nedávná úmrtí</a>%x%j
 <li>{the} <a href="%sm=HIST;k=10">{history of updates}</a>%j
 <li>{the} <a href="%sm=CAL">{calendars}</a>
-<li>{the} <a href="%sm=FORUM">{<font color=green><b>GeneWeb</b></font>
+<li>{the} <a href="%sm=FORUM">{<font color=#2f6400><b>GeneWeb</b></font>
 forum}</a>
 </ul>
 </td>

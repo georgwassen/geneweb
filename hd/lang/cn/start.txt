@@ -15,7 +15,7 @@
 height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=green>利大社惇</font></h1>
+<h1><font color=#2f6400>利大社惇</font></h1>
 </td>
 </tr>
 </table>

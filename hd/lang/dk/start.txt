@@ -14,7 +14,7 @@
 height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=green>Genealogisk<br>database</font></h1>
+<h1><font color=#2f6400>Genealogisk<br>database</font></h1>
 </td>
 </tr>
 </table>
@@ -25,7 +25,7 @@ height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-Databasen <font color=green><b>"%t"</b></font> indeholder for
+Databasen <font color=#2f6400><b>"%t"</b></font> indeholder for
 &oslash;jeblikket %n personer.%o<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%o
 
@@ -67,7 +67,7 @@ For at navigere i denne database, kan du søge:<br><br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=green><b>personnavn</b></font>
+<font color=#2f6400><b>personnavn</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -87,22 +87,22 @@ eller <em>Sosa-nummer</em>, refererende til %a%u
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-<font color=green><b>adelstitel</b></font>
+<font color=#2f6400><b>adelstitel</b></font>
 <input name=t size=14 maxlength=200>
-<font color=green><b>og/eller -navn</b></font>
+<font color=#2f6400><b>og/eller -navn</b></font>
 <input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
 <br>
 ex:
-<font color=green><b>adelstitel</b></font>: roi, duke...
-<font color=green><b>og/eller -navn</b></font>: de France, of Sax...
+<font color=#2f6400><b>adelstitel</b></font>: roi, duke...
+<font color=#2f6400><b>og/eller -navn</b></font>: de France, of Sax...
 </form>
 
 <li>
 
 <form method=GET action="%f">
 %h
-<font color=green><b>i listen</b></font> over alle
+<font color=#2f6400><b>i listen</b></font> over alle
 <select name=m>
 <option value="N" selected>efternavne
 <option value="P">fornavne
@@ -116,8 +116,8 @@ sorteret efter
 </form>
 
 <li>
-<font color=green><b>ved</b></font>
-<a href="%sm=H;v=advanced"><font color=green><b>avanceret
+<font color=#2f6400><b>ved</b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>avanceret
 søgning</b></font></a>.
 
 </ul>
@@ -161,7 +161,7 @@ søgning</b></font></a>.
 <li><a href="%sm=LD;k=10">seneste d&oslash;dsfald</a>%x%j
 <li><a href="%sm=HIST;k=10">opdateringers historie</a>%j
 <li><a href="%sm=CAL">kalendere</a>
-<li><a href="%sm=FORUM"><font color=green><b>GeneWeb</b></font>
+<li><a href="%sm=FORUM"><font color=#2f6400><b>GeneWeb</b></font>
 forum</a>
 </ul>
 </td>

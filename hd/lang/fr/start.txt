@@ -11,11 +11,15 @@
 <table border=0 width="100%">
 <tr>
 <td>
+
+<table border=0><tr><td bgcolor=white>
 <a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
 height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td></tr></table>
+
 </td>
 <td align=left>
-<h1><font color=green>Base de données<br>g&eacute;n&eacute;alogique</font></h1>
+<h1><font color=#2f6400>Base de données<br>g&eacute;n&eacute;alogique</font></h1>
 </td>
 </tr>
 </table>
@@ -26,7 +30,7 @@ height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-La base de donn&eacute;es <font color=green><b>"%t"</b></font> contient
+La base de donn&eacute;es <font color=#2f6400><b>"%t"</b></font> contient
 actuellement %n personnes.%o<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%o
 
@@ -69,7 +73,7 @@ votre recherche:<br><br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=green><b>par personne</b></font> <input name=n size=40
+<font color=#2f6400><b>par personne</b></font> <input name=n size=40
 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -89,22 +93,22 @@ maxlength=200>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-<font color=green><b>par titre</b></font>
+<font color=#2f6400><b>par titre</b></font>
 <input name=t size=13 maxlength=200>
-<font color=green><b>lieu</b></font>
+<font color=#2f6400><b>lieu</b></font>
 <input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
 <br>
 ex:
-<font color=green><b>[title/titles]</b></font>: roi, duke...
-<font color=green><b>[place]</b></font>: de France, of Sax...
+<font color=#2f6400><b>[title/titles]</b></font>: roi, duke...
+<font color=#2f6400><b>[place]</b></font>: de France, of Sax...
 </form>
 
 <li>
 
 <form method=GET action="%f">
 %h
-<font color=green><b>par la liste</b></font> de tous les
+<font color=#2f6400><b>par la liste</b></font> de tous les
 <select name=m>
 <option value="N" selected> patronymes
 <option value="P"> pr&eacute;noms
@@ -119,8 +123,8 @@ par
 
 <li>
 
-<font color=green><b>par la</b></font>
-<a href="%sm=H;v=advanced"><font color=green><b>requ&ecirc;te
+<font color=#2f6400><b>par la</b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>requ&ecirc;te
 &eacute;volu&eacute;e</b></font></a>.
 
 </ul>
@@ -165,7 +169,7 @@ d&eacute;c&eacute;d&eacute;es</a>
 <li>les <a href="%sm=LD;k=10">derniers d&eacute;c&egrave;s</a>%x%j
 <li>l'<a href="%sm=HIST;k=10">historique des mises-&agrave;-jour</a>%j
 <li>les <a href="%sm=CAL">calendriers</a>
-<li>le <a href="%sm=FORUM">forum <font color=green><b>GeneWeb</b></font></a>
+<li>le <a href="%sm=FORUM">forum <font color=#2f6400><b>GeneWeb</b></font></a>
 </ul>
 </td>
 </tr>
