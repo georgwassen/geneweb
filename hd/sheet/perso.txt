@@ -1,4 +1,4 @@
-<comm e="$Id: perso.txt,v 1.1.2.5 1999-04-09 14:09:23 ddr Exp $">
+<comm e="$Id: perso.txt,v 1.1.2.6 1999-04-09 20:28:12 ddr Exp $">
 <comm e="Copyright (c) 1999 INRIA">
 <comm
   Context:
@@ -240,16 +240,21 @@
 
 <if auth p>
   <match (burial p, burial_place p)>
-  <with (Buried d, "")>
+  <with (Buried (Some d), "")>
     <em><eval transl_nth "Buried" (sex p)> <eval ondate d>.</em><br>
-  <with (Buried d, s)>
-    <em><eval transl_nth "Buried" (sex p)> <eval ondate d> - <eval s>.</em>
-    <br>
-  <with (Cremated d, "")>
+  <with (Buried (Some d), s)>
+    <em><eval transl_nth "Buried" (sex p)> <eval ondate d> - <eval s>.</em><br>
+  <with (Buried None, "")>
+  <with (Buried None, s)>
+    <em><eval transl_nth "Buried" (sex p)> - <eval s>.</em><br>
+  <with (Cremated (Some d), "")>
     <em><eval transl_nth "Cremated" (sex p)> <eval ondate d>.</em><br>
-  <with (Cremated d, "")>
+  <with (Cremated (Some d), s)>
     <em><eval transl_nth "Cremated" (sex p)> <eval ondate d> - <eval s>.</em>
     <br>
+  <with (Cremated None, "")>
+  <with (Cremated None, s)>
+    <em><eval transl_nth "Cremated" (sex p)> - <eval s>.</em><br>
   </match>
 </if>
 

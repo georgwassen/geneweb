@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: global.ml,v 1.1.2.3 1999-04-09 14:09:27 ddr Exp $ *)
+(* $Id: global.ml,v 1.1.2.4 1999-04-09 20:28:12 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -217,7 +217,7 @@ value table =
      ("lower",
       (fun conf base ->
          Obj.repr
-           (fun s -> Name.lower s :
+           (fun s -> Util.coa conf (Name.lower (Util.aoc conf s)) :
             string -> string),
        <:ctyp< string -> string >>));
      ("main_title",

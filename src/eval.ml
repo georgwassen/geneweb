@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: eval.ml,v 1.1.2.4 1999-04-09 14:09:26 ddr Exp $ *)
+(* $Id: eval.ml,v 1.1.2.5 1999-04-09 20:28:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -118,6 +118,7 @@ GEXTEND G
       | s = INT -> <:patt< $int:s$ >>
       | s = STRING -> <:patt< $str:s$ >>
       | "_" -> <:patt< _ >>
+      | "("; p = patt; ")" -> p
       | "("; p = patt; ","; pl = LIST1 patt SEP ","; ")" ->
           <:patt< ($list:[p :: pl]$) >>
       | "["; p1 = patt; "::"; p2 = patt; "]" ->
@@ -297,15 +298,25 @@ do Printf.eprintf "... binding %s\n" s; flush stderr; return
         | (_, <:patt< DontKnowIfDead >>) -> None
         | _ -> eval_err "matching a death type with incompatible pattern" ]
     | (<:ctyp< death_reason >>, p) ->
-       match ((Obj.magic v : death_reason), p) with
-       [ (Unspecified, <:patt< Unspecified >>) -> Some []
-       | (Murdered, <:patt< Murdered >>) -> Some []
-       | (Killed, <:patt< Killed >>) -> Some []
-       | (Executed, <:patt< Executed >>) -> Some []
-       | (_, <:patt< Unspecified >> | <:patt< Murdered >>) -> None
-       | (_, <:patt< Killed >> | <:patt< Executed >>) -> None
-       | _ ->
-           eval_err "matching a death_reason type with incompatible pattern" ]
+        match ((Obj.magic v : death_reason), p) with
+        [ (Unspecified, <:patt< Unspecified >>) -> Some []
+        | (Murdered, <:patt< Murdered >>) -> Some []
+        | (Killed, <:patt< Killed >>) -> Some []
+        | (Executed, <:patt< Executed >>) -> Some []
+        | (_, <:patt< Unspecified >> | <:patt< Murdered >>) -> None
+        | (_, <:patt< Killed >> | <:patt< Executed >>) -> None
+        | _ ->
+            eval_err "matching a death_reason type with incompatible pattern" ]
+    | (<:ctyp< burial >>, p) ->
+        match ((Obj.magic v : burial), p) with
+        [ (Buried d, <:patt< Buried $p$ >>) ->
+            matching (Obj.repr (Adef.od_of_codate d : option date))
+              (<:ctyp< option date >>, p)
+        | (Cremated d, <:patt< Cremated $p$ >>) ->
+            matching (Obj.repr (Adef.od_of_codate d : option date))
+              (<:ctyp< option date >>, p)
+        | (_, <:patt< Buried $_$ >> | <:patt< Cremated $_$ >>) -> None
+        | _ -> eval_err "matching a burial type with incompatible pattern" ]
     | (<:ctyp< int >>, <:patt< $int:s$ >>) ->
         if (Obj.magic v : int) = int_of_string s then Some [] else None
     | ((<:ctyp< list $t$ >> as tl), p) ->
