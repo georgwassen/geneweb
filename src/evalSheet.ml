@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: evalSheet.ml,v 1.1.2.10 1999-04-12 16:15:44 ddr Exp $ *)
+(* $Id: evalSheet.ml,v 1.1.2.11 1999-04-13 05:27:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -248,6 +248,7 @@ and eval_statement conf global env pend_nl statl =
   | Sxml (PXML.Xind ind) ->
       ([ind :: pend_nl], statl) ]
 and eval_format conf global env pend_nl s statl =
+  do flush_nl pend_nl; return
   let (fast, astl) = Eval.simple_expr_list s in
   let x = Eval.eval_expr global env fast in
   match x.Eval.ctyp with

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_sheet.ml,v 1.1.2.4 1999-04-12 16:15:44 ddr Exp $ *)
+(* $Id: pa_sheet.ml,v 1.1.2.5 1999-04-13 05:27:59 ddr Exp $ *)
 
 value token_of_xast =
   fun
@@ -18,7 +18,7 @@ value token_of_xast =
       | "match" -> ("MATCH", p)
       | "strip" -> ("STRIP", p)
       | "with" -> ("WITH", p)
-      | t -> if p = "" then ("TAG", t) else ("TAG", t ^ " " ^ p) ]
+      | _ -> if p = "" then ("TAG", t) else ("TAG", t ^ " " ^ p) ]
   | PXML.Xetag t ->
       match String.lowercase t with
       [ "body" -> ("E_BODY", "")
@@ -26,7 +26,7 @@ value token_of_xast =
       | "format" -> ("E_FORMAT", "")
       | "if" -> ("E_IF", "")
       | "match" -> ("E_MATCH", "")
-      | t -> ("ETAG", t) ]
+      | _ -> ("ETAG", t) ]
   | PXML.Xtext s -> ("TEXT", s)
   | PXML.Xind i -> ("IND", string_of_int i) ]
 ;
@@ -216,14 +216,19 @@ value rec get_defined_ident =
   | MLast.PaXnd _ _ p -> get_defined_ident p ]
 ;
 
-value adjust_expr =
+value rec strip =
+  fun
+  [ [<:expr< indent $_$ >> :: el] -> strip el
+  | el -> el ]
+;
+
+value adjust_sequence =
   let rec expr env e =
     let loc = MLast.loc_of_expr e in
     match e with
-    [ <:expr< $e1$ $e2$ >> -> <:expr< $expr env e1$ $expr env e2$ >>
-    | <:expr< do $list:el$ return $e$ >> ->
-        let el = sequence env el in
-        <:expr< do $list:el$ return $expr env e$ >>
+    [ <:expr< do $list:el$ return () >> ->
+        let el = sequence [] env el in
+        expr_of_expr_list loc el
     | <:expr< let $p$ = $e1$ in $e2$ >> ->
         let nenv = get_defined_ident p @ env in
         <:expr< let $p$ = $expr env e1$ in $expr nenv e2$ >>
@@ -232,17 +237,13 @@ value adjust_expr =
         <:expr< match $expr env e$ with [ $list:ml$ ] >>
     | <:expr< if $e1$ then $e2$ else $e3$ >> ->
         <:expr< if $expr env e1$ then $expr env e2$ else $expr env e3$ >>
-    | <:expr< fun $p$ -> $e$ >> ->
-       <:expr< fun $p$ -> $expr (get_defined_ident p @ env) e$ >>
+    | <:expr< fun $p$ -> $body$ >> ->
+        <:expr< fun $p$ -> $expr (get_defined_ident p @ env) body$ >>
+    | <:expr< $e1$ $e2$ >> -> <:expr< $expr env e1$ $expr env e2$ >>
     | <:expr< ($list:el$) >> -> <:expr< ($list:List.map (expr env) el$) >>
     | <:expr< $lid:s$ >> ->
         if List.mem s env then e else <:expr< $e$ conf base >>
     | _ -> e ]
-  and sequence env =
-    fun
-    [ [<:expr< do $list:el1$ return () >> :: el] -> sequence env (el1 @ el)
-    | [e :: el] -> [expr env e :: sequence env el]
-    | [] -> [] ]
   and match_case env (p, w, e) =
     let env = get_defined_ident p @ env in
     let w =
@@ -251,8 +252,57 @@ value adjust_expr =
       | None -> None ]
     in
     (p, w, expr env e)
+  and sequence pend_nl env =
+    fun
+    [ [<:expr< do $list:el1$ return () >> :: el] ->
+        sequence pend_nl env (el1 @ el)
+    | [(<:expr< indent $_$ >> as e) :: el] -> sequence [e :: pend_nl] env el
+    | [e :: el] ->
+        if pend_nl = [] then [expr env e :: sequence [] env el]
+        else
+          let loc = MLast.loc_of_expr e in
+          let el1 =
+            match e with
+            [ <:expr< match $e1$ with [ $list:ml$ ] >> ->
+                let ml = List.map (dispatch_pend_in_case pend_nl env) ml in
+                [<:expr< match $expr env e1$ with [ $list:ml$ ] >>]
+            | <:expr< if $e1$ then $e2$ else () >> ->
+                let e2 =
+                  expr_of_expr_list (MLast.loc_of_expr e2)
+                    (sequence pend_nl env [e2])
+                in
+                [<:expr< if $expr env e1$ then $e2$ else () >>]
+            | <:expr< List.iter (fun $p$ -> $body$) $e1$ >> ->
+                let body =
+                  let seq =
+                    sequence pend_nl (get_defined_ident p @ ["first" :: env])
+                      [body]
+                  in
+                  expr_of_expr_list (MLast.loc_of_expr body) seq
+                in
+                let e1 = expr env e1 in
+                [<:expr< List.iter (fun $p$ -> $body$) $e1$ >>]
+            | _ ->
+                List.rev pend_nl @ [expr env e] ]
+          in
+          el1 @ sequence [] env el
+    | [] -> List.rev pend_nl ]
+  and dispatch_pend_in_case pend_nl env (p, w, e) =
+    let env = get_defined_ident p @ env in
+    let w =
+      match w with
+      [ Some e -> Some (expr env e)
+      | None -> None ]
+    in
+    let e =
+      match e with
+      [ <:expr< () >> -> e
+      | _ ->
+          expr_of_expr_list (MLast.loc_of_expr e) (sequence pend_nl env [e]) ]
+    in
+    (p, w, e)
   in
-  expr
+  sequence []
 ;
 
 value print_with_antiquot loc sh s =
@@ -281,12 +331,6 @@ value print_with_antiquot loc sh s =
     else []
 ;
 
-value rec strip =
-  fun
-  [ [<:expr< indent $_$ >> :: el] -> strip el
-  | el -> el ]
-;
-
 value setindent ind el =
   let rec do_e e =
     let loc = MLast.loc_of_expr e in
@@ -299,6 +343,8 @@ value setindent ind el =
         <:expr< List.iter (fun $p$ -> $do_e body$) $e$ >>
     | <:expr< match $e$ with [ $list:ml$ ] >> ->
         <:expr< match $e$ with [ $list:List.map do_match_case ml$ ] >>
+    | <:expr< let $p$ = $e$ in $body$ >> ->
+        <:expr< let $p$ = $e$ in $do_e body$ >>
     | <:expr< indent $int:ind0$ >> ->
         let ind = max 0 (int_of_string ind0 - ind) in
         <:expr< indent $int:string_of_int ind$ >>
@@ -318,6 +364,10 @@ value rec get_min_indent =
       match get_min_indent el with
       [ Some sind -> Some (min ind sind)
       | None -> Some ind ]
+(*
+  | [<:expr< let $_$ = $_$ in do $list:el0$; return () >> :: el] ->
+      get_min_indent (el0 @ el)
+*)
   | [_ :: el] -> get_min_indent el
   | [] -> None ]
 ;
@@ -334,6 +384,12 @@ value reindent el =
   in
   List.rev rev_el
 ;
+
+(*
+value strip x = x;
+value reindent x = x;
+value adjust_sequence env el = el;
+*)
 
 value glob_no_conf_base =
   ["&&"; "||"; "+"; "-"; "^"; "="; "<>"; "<"; ">"; "not"; "string_of_int";
@@ -354,7 +410,7 @@ EXTEND
               | el -> el ]
           in                  
           let env = param_list () in
-          let el = List.map (adjust_expr (env @ glob_no_conf_base)) el in
+          let el = adjust_sequence (env @ glob_no_conf_base) el in
           let e =
             List.fold_left (fun e p -> <:expr< fun $lid:p$ -> $e$ >>)
               <:expr< do $list:el$ return () >> env
@@ -366,22 +422,22 @@ EXTEND
     [ [ e = MATCH; ml = LIST0 match_case; E_MATCH ->
           let e = expr_of_string loc (String.length "<match ") e in
           <:expr< match $e$ with [ $list:ml$ ] >>
-      | e = LET; el = LIST0 expr ->
+      | e = LET; el = sequence ->
           let (p, e) = patt_eq_expr_of_string loc (String.length "<let ") e in
           let body = expr_of_expr_list loc (strip el) in
           <:expr< let $p$ = $e$ in $body$ >>
-      | e = FOR; el = LIST0 expr; E_FOR ->
+      | e = FOR; el = sequence; E_FOR ->
           let (p, e) = patt_in_expr_of_string loc (String.length "<for ") e in
-          let body = expr_of_expr_list loc el in
+          let body = expr_of_expr_list loc (strip (reindent el)) in
           <:expr< List.iter (fun $p$ -> $body$) $e$ >>
-      | e = IF; el1 = LIST0 expr; ELSE; el2 = LIST0 expr; E_IF ->
+      | e = IF; el1 = sequence; ELSE; el2 = sequence; E_IF ->
           let e = expr_of_string loc (String.length "<if ") e in
-          let e1 = expr_of_expr_list loc (strip el1) in
-          let e2 = expr_of_expr_list loc (strip el2) in
+          let e1 = expr_of_expr_list loc (strip (reindent el1)) in
+          let e2 = expr_of_expr_list loc (strip (reindent el2)) in
           <:expr< if $e$ then $e1$ else $e2$ >>
-      | e = IF; el1 = LIST0 expr; E_IF ->
+      | e = IF; el1 = sequence; E_IF ->
           let e = expr_of_string loc (String.length "<if ") e in
-          let e1 = expr_of_expr_list loc el1 in
+          let e1 = expr_of_expr_list loc (strip (reindent el1)) in
           <:expr< if $e$ then $e1$ else () >>
       | e = EVAL ->
           let e = expr_of_string loc (String.length "<eval ") e in
@@ -423,8 +479,12 @@ EXTEND
       | t = ETAG -> <:expr< wprint $str:"</" ^ t ^ ">"$ >>
       | t = TEXT -> <:expr< wprint $str:t$ >>
       | t = TAG -> <:expr< wprint "<%s>" $str:t$ >>
-      | COMM; e = expr -> e
-      | STRIP; el = LIST0 expr -> expr_of_expr_list loc (strip el) ] ]
+      | COMM; e = expr -> e ] ]
+  ;
+  sequence:
+    [ [ STRIP; el = sequence -> strip el
+      | e = expr; el = sequence -> [e :: el]
+      | -> [] ] ]
   ;
   format_expr_list:
     [ [ IND; el = format_expr_list -> el
@@ -432,7 +492,7 @@ EXTEND
       | -> [] ] ]
   ;
   match_case:
-    [ [ p = WITH; el = LIST0 expr ->
+    [ [ p = WITH; el = sequence ->
           let (p, w) = patt_of_string loc (String.length "<with ") p in
           let e = expr_of_expr_list loc (strip (reindent el)) in
           (p, w, e)

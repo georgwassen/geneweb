@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: globDef.ml,v 1.1.2.2 1999-04-11 19:28:13 ddr Exp $ *)
+(* $Id: globDef.ml,v 1.1.2.3 1999-04-13 05:27:59 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -26,6 +26,15 @@ value indent ind =
 value f_uncapitalize (s : format 'a 'b 'c) =
   (Obj.magic String.uncapitalize (Obj.magic s) : format 'a 'b 'c)
 ;
+
+(*
+value list_iter_first f =
+  loop True where rec loop first =
+    fun
+    [ [x :: l] -> do f first x; return loop False l
+    | [] -> () ]
+;
+*)
 
 value access conf base p = Util.acces conf base p
 and aliases conf base p =
