@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.52.2.4 1999-10-23 21:07:17 ddr Exp $ *)
+(* $Id: perso.ml,v 2.52.2.5 1999-10-24 07:46:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -941,17 +941,14 @@ value photo_and_size conf base p =
 
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
-value print_occupation_dates conf base make_table p =
+value print_occupation_dates conf base in_table p =
   let a = aoi base p.cle_index in
   let (open_area, close_area) =
     let opened = ref False in
     (fun () ->
        do if not opened.val then
-            do if make_table then
-	         Wserver.wprint "<table border=%d width=\"95%%\">\n<tr>\n"
-                   conf.border
-               else ();
-               Wserver.wprint "<td>\n<ul>\n";
+            do if in_table then Wserver.wprint "<td>\n" else ();
+               Wserver.wprint "<ul>\n";
 	       opened.val := True;
 	    return ()
           else ();
@@ -959,8 +956,8 @@ value print_occupation_dates conf base make_table p =
        return (),
      fun () ->
        if opened.val then
-         do Wserver.wprint "</ul>\n</td>\n";
-	    if make_table then Wserver.wprint "</tr>\n</table>\n" else ();
+         do Wserver.wprint "</ul>\n";
+	    if in_table then Wserver.wprint "</td>\n" else ();
 	 return ()
        else ())
   in
@@ -1002,16 +999,16 @@ value print_photo_occupation_dates conf base p =
               (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
               (Util.code_varenv b) width height image_txt;
           end;
-          print_occupation_dates conf base False p;
+          print_occupation_dates conf base True p;
         end;
       end
   | Some (link, None) ->
       do Wserver.wprint "<img src=\"%s\" alt=\"%s\">" link image_txt;
          html_p conf;
-         print_occupation_dates conf base True p;
+         print_occupation_dates conf base False p;
       return ()
   | None ->
-      print_occupation_dates conf base True p ]
+      print_occupation_dates conf base False p ]
 ;
 
 value print_ancestors_descends_cousins conf base p a =
