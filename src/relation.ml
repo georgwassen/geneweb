@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.33 1999-10-21 18:18:03 ddr Exp $ *)
+(* $Id: relation.ml,v 2.33.2.1 1999-10-23 21:07:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -75,7 +75,7 @@ value print_menu conf base p =
     return ()
   in
   let is = index_of_sex p.sex in
-  do header conf title;
+  do cheader conf title;
      tag "form" "method=get action=\"%s\"" conf.command begin
        Srcfile.hidden_env conf;
        Wserver.wprint "<input type=hidden name=em value=R>\n";
@@ -156,20 +156,35 @@ value print_menu conf base p =
            p.family;
        end;
        html_p conf;
-       Wserver.wprint "%s\n" (capitale (transl conf "long display"));
-       Wserver.wprint "<input type=checkbox name=long value=on>\n";
-       html_br conf;
-       Wserver.wprint "%s\n"
-         (capitale (transl conf "relationships by marriage"));
-       Wserver.wprint "<input type=checkbox name=marr value=on>\n";
-       html_br conf;
-       Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
-       Wserver.wprint "<input type=checkbox name=spouse value=on>\n";
-       html_br conf;
-       Wserver.wprint "%s\n" (capitale (transl conf "cancel GeneWeb links"));
-       Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
-       html_p conf;
-       Wserver.wprint "<input type=submit value=\"Ok\">\n";
+       tag "table" "border=%d width=\"90%%\"" conf.border begin
+         tag "tr" begin
+           tag "td" "align=right" begin
+             Wserver.wprint "%s\n" (capitale (transl conf "long display"));
+             Wserver.wprint "<input type=checkbox name=long value=on>";
+           end;
+           tag "td" "align=right" begin
+             Wserver.wprint "%s\n"
+               (capitale (transl conf "relationships by marriage"));
+             Wserver.wprint "<input type=checkbox name=marr value=on>\n";
+           end;
+         end;
+         tag "tr" begin
+           tag "td" "align=right" begin
+             Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
+             Wserver.wprint "<input type=checkbox name=spouse value=on>\n";
+           end;
+           tag "td" "align=right" begin
+             Wserver.wprint "%s\n"
+               (capitale (transl conf "cancel GeneWeb links"));
+             Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
+           end;
+         end;
+         tag "tr" begin
+           tag "td" "align=center colspan=2" begin
+             Wserver.wprint "<input type=submit value=\"Ok\">\n";
+           end;
+         end;
+       end;
      end;
      trailer conf;
   return ()

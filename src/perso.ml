@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.52.2.3 1999-10-23 13:48:07 ddr Exp $ *)
+(* $Id: perso.ml,v 2.52.2.4 1999-10-23 21:07:17 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -941,17 +941,28 @@ value photo_and_size conf base p =
 
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
-value print_occupation_dates conf base p =
+value print_occupation_dates conf base make_table p =
   let a = aoi base p.cle_index in
   let (open_area, close_area) =
     let opened = ref False in
     (fun () ->
        do if not opened.val then
-            do Wserver.wprint "<td>\n<ul>\n"; opened.val := True; return ()
+            do if make_table then
+	         Wserver.wprint "<table border=%d width=\"95%%\">\n<tr>\n"
+                   conf.border
+               else ();
+               Wserver.wprint "<td>\n<ul>\n";
+	       opened.val := True;
+	    return ()
           else ();
           html_li conf;
        return (),
-     fun () -> if opened.val then Wserver.wprint "</ul>\n</td>\n" else ())
+     fun () ->
+       if opened.val then
+         do Wserver.wprint "</ul>\n</td>\n";
+	    if make_table then Wserver.wprint "</tr>\n</table>\n" else ();
+	 return ()
+       else ())
   in
   do match sou base p.occupation with
      [ "" -> ()
@@ -976,35 +987,31 @@ value print_occupation_dates conf base p =
   return ()
 ;
 
-value print_photo_dates_welcome conf base p =
+value print_photo_occupation_dates conf base p =
   let image_txt = capitale (transl conf "image") in
   match photo_and_size conf base p with
-  [ Some (link, None) ->
-      do print_link_to_welcome conf True;
-         Wserver.wprint "<img src=\"%s\" alt=\"%s\">" link image_txt;
-         html_p conf;
-         print_occupation_dates conf base p;
-      return ()
-  | x ->
-      tag "table" "border=%d width=\"100%%\"" conf.border begin
+  [ Some (fname, Some (width, height)) ->
+      tag "table" "border=%d width=\"95%%\"" conf.border begin
         tag "tr" begin
-          match x with
-          [ Some (fname, Some (width, height)) ->
-              let s = Unix.stat fname in
-              let b = Filename.basename fname in
-              tag "td" begin
-                Wserver.wprint "\
-<img src=\"%sm=IM;d=%d;v=/%s\" width=%d height=%d alt=\"%s\">"
-                 (commd conf)
-                 (int_of_float
-                    (mod_float s.Unix.st_mtime (float_of_int max_int)))
-                 (Util.code_varenv b) width height image_txt;
-              end
-          | _ -> () ];
-          print_occupation_dates conf base p;
-          tag "td" "valign=top" begin print_link_to_welcome conf True; end;
+          let s = Unix.stat fname in
+          let b = Filename.basename fname in
+          tag "td" begin
+            Wserver.wprint
+              "<img src=\"%sm=IM;d=%d;v=/%s\" width=%d height=%d alt=\"%s\">"
+              (commd conf)
+              (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
+              (Util.code_varenv b) width height image_txt;
+          end;
+          print_occupation_dates conf base False p;
         end;
-      end ]
+      end
+  | Some (link, None) ->
+      do Wserver.wprint "<img src=\"%s\" alt=\"%s\">" link image_txt;
+         html_p conf;
+         print_occupation_dates conf base True p;
+      return ()
+  | None ->
+      print_occupation_dates conf base True p ]
 ;
 
 value print_ancestors_descends_cousins conf base p a =
@@ -1073,7 +1080,8 @@ value print conf base p =
   let a = aoi base p.cle_index in
   do cheader conf title;
      print_sub_titles conf base p;
-     print_photo_dates_welcome conf base p;
+     print_link_to_welcome conf True;
+     print_photo_occupation_dates conf base p;
      print_parents conf base a;
      print_families conf base p a;
      print_notes conf base p;
