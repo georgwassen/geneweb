@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.20 1999-10-08 14:52:19 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.20.2.1 1999-10-21 21:07:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -184,7 +184,7 @@ value rec copy_from_channel conf base ic =
                 in
                 let s =
                   try s ^ " " ^ List.assoc "body_prop" conf.base_env with
-                  [ Not_found -> s ]
+                  [ Not_found -> s ^ default_body_prop conf ]
                 in
                 do if s <> "" then Wserver.wprint "%s" s else ();
                    List.iter (fun t -> Wserver.wprint "><%s" t)
@@ -223,11 +223,7 @@ value rec copy_from_channel conf base ic =
                   (transl conf "(thousand separator)")
                   (Num.of_int (wc + rc))
             | 'r' -> copy_from_file conf base (input_line ic)
-            | 's' ->
-                do Wserver.wprint "%s?" conf.command;
-                   List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v)
-                     (conf.henv @ conf.senv);
-                return ()
+            | 's' -> Wserver.wprint "%s" (commd conf)
             | 't' -> Wserver.wprint "%s" conf.bname
             | 'u' ->
                 match Util.find_person_in_env conf base "z" with

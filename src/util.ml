@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.52 1999-10-19 08:58:45 ddr Exp $ *)
+(* $Id: util.ml,v 2.52.2.1 1999-10-21 21:07:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -69,8 +69,7 @@ value wprint_with_enclosing_tags conf (fmt : format 'a 'b 'c)  =
 
 value commd conf =
   let c = conf.command ^ "?" in
-  List.fold_left
-    (fun c (k, v) -> c ^ k ^ (if v = "" then "" else "=" ^ v) ^ ";") c
+  List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
     (conf.henv @ conf.senv)
 ;
 
@@ -553,6 +552,10 @@ value index_of_sex =
   | Neuter -> 2 ]
 ;
 
+value default_body_prop conf =
+  " background=\"" ^ conf.command ^ "?m=IM;v=/gwback.gif\""
+;
+
 value header_no_page_title conf title =
   do html conf;
      Wserver.wprint "\
@@ -570,7 +573,7 @@ value header_no_page_title conf title =
      in
      let s =
        try s ^ " " ^ List.assoc "body_prop" conf.base_env with
-       [ Not_found -> s ]
+       [ Not_found -> s ^ default_body_prop conf ]
      in
      Wserver.wprint "<body%s>" s;
      List.iter (fun t -> Wserver.wprint "<%s>" t) (enclosing_tags conf);
@@ -705,10 +708,10 @@ value copy_string_with_macros conf s =
 
 value trailer conf =
   let env =
-    [('s', conf.command ^ "?");
+    [('s', commd conf);
      ('d',
       if conf.cancel_links then ""
-      else " - <a href=\"" ^ conf.command ^ "?m=DOC\">DOC</a>")]
+      else " - <a href=\"" ^ commd conf ^ "m=DOC\">DOC</a>")]
   in
   do try copy_etc_file env "copyr" with
      [ Sys_error _ ->

@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.31 1999-09-14 22:34:04 ddr Exp $ *)
+(* $Id: util.mli,v 2.31.2.1 1999-10-21 21:07:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -72,6 +72,7 @@ value trailer : config -> unit;
 value copy_etc_file : list (char * string) -> string -> unit;
 value copy_from_channel : list (char * string) -> in_channel -> unit;
 value copy_string_with_macros : config -> string -> unit;
+value default_body_prop : config -> string;
 
 value print_alphab_list :
   config -> ('a -> string) -> ('a -> unit) -> list 'a -> unit;

@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 2.7 1999-10-05 20:59:24 ddr Exp $ *)
+(* $Id: doc.ml,v 2.7.2.1 1999-10-21 21:07:03 ddr Exp $ *)
 
 open Config;
 
@@ -9,7 +9,7 @@ value start_with s i p =
 
 value http = "http://";
 
-value copy pref s =
+value copy conf pref s =
   let last8 = String.make 8 ' ' in
   let insert c =
     let c = Char.lowercase c in
@@ -31,6 +31,12 @@ value copy pref s =
            else Wserver.wprint "%s" pref;
         return
         loop i
+      else if String.sub last8 2 6 = "<body>" then
+        let s =
+          try " " ^ List.assoc "body_prop" conf.base_env with
+          [ Not_found -> Util.default_body_prop conf ]
+        in
+        do Wserver.wprint "%s>" s; return loop (i + 1)
       else do Wserver.wprint "%c" s.[i]; return loop (i + 1)
 ;
 
@@ -72,7 +78,7 @@ value print conf =
          let dir = if dir = "./" then "" else dir in
          conf.command ^ "?m=DOC;v=" ^ dir
        in
-       copy pref s
+       copy conf pref s
     | None -> Util.incorrect_request conf ]
   else Util.incorrect_request conf
 ;
