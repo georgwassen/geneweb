@@ -1,5 +1,5 @@
-(* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.13 1999-04-06 07:22:35 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo q_MLast.cmo *)
+(* $Id: perso.ml,v 2.13.2.1 1999-04-06 18:43:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -737,6 +737,57 @@ value print_ancestors_descends_cousins conf base p a =
 
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
+value loc = (0, 0);
+
+Hashtbl.add Global.table
+  "find_sosa"
+  (fun conf base ->
+     Obj.repr
+       (find_sosa_optim conf base :
+        person -> person -> option Num.t),
+   <:ctyp< person -> person -> option num >>)
+;
+
+Hashtbl.add Global.table
+  "titles"
+  (fun conf base ->
+     Obj.repr
+       (fun p ->
+          print_titles conf base (transl conf "and") p (aoi base p.cle_index) :
+        person -> unit),
+   <:ctyp< person -> unit >>)
+;
+
+value interp_sheet conf base p fname =
+  let fname =
+    List.fold_right Filename.concat [Util.lang_dir.val; "sheet"] fname
+  in
+  try
+    let xast =
+      let ic = open_in fname in
+      let r = PXML.f (Stream.of_channel ic) in
+      do close_in ic; return r
+    in
+    let global x =
+      let (f, t) = Hashtbl.find Global.table x in
+      {Eval.cval = f conf base; Eval.ctyp = t}
+    in
+    let env =
+      [("p",
+        {Eval.cval = Obj.repr (p : person);
+         Eval.ctyp = <:ctyp< person >>})]
+    in
+    InterpSheet.eval conf global env xast
+  with
+  [ Exit -> ()
+  | Stdpp.Exc_located loc (Stream.Error err) ->
+      do Printf.eprintf "*** Error while parsing file \"%s\"\n" fname;
+         Printf.eprintf "at location: (%d, %d)\n" (fst loc) (snd loc);
+         Printf.eprintf "message: \"%s\"\n" err;
+         flush stderr;
+      return () ]
+;
+
 value print conf base p =
   let title h =
     match (sou base p.public_name, p.nick_names) with
@@ -777,6 +828,7 @@ value print conf base p =
           return () ]
   in
   let a = aoi base p.cle_index in
+  do interp_sheet conf base p "perso.tpl"; return
   do header conf title;
      print_sosa_if_any conf base p;
      print_link_to_welcome conf True;
@@ -847,7 +899,6 @@ value print conf base p =
               return ())
            nnl
      | _ -> () ];
-     let is = index_of_sex p.sex in
      List.iter
        (fun a ->
           do Wserver.wprint "%s <em><strong>%s</strong></em>"
