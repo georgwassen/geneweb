@@ -27,8 +27,8 @@ height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <p>
 
 La base de donn&eacute;es <font color=green><b>"%t"</b></font> contient
-actuellement %n personnes%o<br>
-(<a href="%sm=NOTES">[note/notes]1</a>)%o.
+actuellement %n personnes.%o<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%o
 
 %y<br><p>
 
@@ -92,7 +92,7 @@ maxlength=200>
 <font color=green><b>par titre</b></font>
 <input name=t size=14 maxlength=200>
 <font color=green><b>lieu</b></font>
-<input name=p size=25 maxlength=200> =&gt;
+<input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
 </form>
 
@@ -100,7 +100,7 @@ maxlength=200>
 
 <form method=GET action="%f">
 %h
-<font color=green><b>par la liste</font></b> de tous les
+<font color=green><b>par la liste</b></font> de tous les
 <select name=m>
 <option value="N" selected> patronymes
 <option value="P"> pr&eacute;noms
@@ -109,12 +109,15 @@ par
 <select name=tri>
 <option value="A" selected> ordre alphab&eacute;tique
 <option value="F"> fr&eacute;quence
-</select> =&gt;
+</select>
 <input type=submit value="Ok">
 </form>
 
-<li> par la <a href="%sm=H;v=advanced"><font
-color=green><b>requ&ecirc;te &eacute;volu&eacute;e</b></font></a>.
+<li>
+
+<font color=green><b>par la</b></font>
+<a href="%sm=H;v=advanced"><font color=green><b>requ&ecirc;te
+&eacute;volu&eacute;e</b></font></a>.
 
 </ul>
 

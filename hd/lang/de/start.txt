@@ -15,7 +15,7 @@
 height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=center>
-<h1><font color=green>[Genealogical<br>data base]</font></h1>
+<h1><font color=green>{Genealogical<br>data base}</font></h1>
 </td>
 </tr>
 </table>
@@ -27,19 +27,19 @@ height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <p>
 
 Die Datenbank <font color=green><b>"%t"</b></font> enth&auml;lt
-z.Zt. %n Personen%o<br>
-(<a href="%sm=NOTES">[note/notes]1</a>)%o.
+z.Zt. %n Personen.%o<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%o
 
 %y<br><p>
 
 <table border=0 width="70%">
 <tr>
 
-<td align=center><a href="%sw=w">[<em>Wizard</em></a> access<br>
-(password)].</td>
+<td align=center><a href="%sw=w">{<em>Wizard</em></a> access<br>
+(password)}.</td>
 
-%y%z<td align=center><a href="%sw=f">[<em>Friend</em></a> access<br>
-(password)].</td>
+%y%z<td align=center><a href="%sw=f">{<em>Friend</em></a> access<br>
+(password)}.</td>
 
 %z%y</tr></table>
 
@@ -48,7 +48,7 @@ z.Zt. %n Personen%o<br>
 <table border=0>
 <tr><td align=center>
 <form method=get action="%f">
-%h[Password, for <em>friend</em> or <em>wizard</em> access]</em>:
+%h{Password, for <em>friend</em> or <em>wizard</em> access}</em>:
 <input name=w size=10 maxlength=200>
 </form>
 </td></tr>
@@ -60,7 +60,7 @@ z.Zt. %n Personen%o<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-[To navigate in this data base, you can do your search]:<br><br>
+{To navigate in this data base, you can do your search}:<br><br>
 
 <ul>
 
@@ -68,7 +68,7 @@ z.Zt. %n Personen%o<br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=green><b>[by person]</b></font>
+<font color=green><b>{by person}</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -91,7 +91,7 @@ z.Zt. %n Personen%o<br>
 <font color=green><b>bei Titel</b></font>
 <input name=t size=14 maxlength=200>
 <font color=green><b>Platz</b></font>
-<input name=p size=25 maxlength=200> =&gt
+<input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
 </form>
 
@@ -99,7 +99,7 @@ z.Zt. %n Personen%o<br>
 
 <form method=GET action="%f">
 %h
-<font color=green><b>[by the list]</font></b> [of all]
+<font color=green><b>{by the list}</b></font> {of all}
 <select name=m>
 <option value="N" selected>Nachnamen
 <option value="P">Vornamen
@@ -107,11 +107,13 @@ z.Zt. %n Personen%o<br>
 <select name=tri>
 <option value="A" selected>alphabetisch sortiert
 <option value="F">nach H&auml;ufigkeit
-</select> =&gt;
+</select>
 <input type=submit value="Ok">
 </form>
 
-<li>[by the] <a href="%sm=H;v=advanced"><font color=green><b>Erweiterte
+<li>
+<font color=green><b>{by the}</b></font>
+<a href="%sm=H;v=advanced"><font color=green><b>Erweiterte
 Suche</b></font></a>.
 
 </ul>
@@ -138,7 +140,7 @@ Suche</b></font></a>.
 <br>
 %w
 
-<center>[You can also consult]<br><br>
+<center>{You can also consult}<br><br>
 
 <table border=0>
 <tr>
@@ -153,10 +155,10 @@ Suche</b></font></a>.
 <td valign=up>
 <ul>%x
 <li>die <a href="%sm=LD;k=10">letzten Ableben</a>%x%j
-<li>die <a href="%sm=HIST;k=10">[history of updates]</a>%j
-<li>[the] <a href="%sm=CAL">Kalender</a>
-<li>[the] [<a href="%sm=FORUM"><font color=green><b>GeneWeb</b></font>
-forum]</a>
+<li>die <a href="%sm=HIST;k=10">{history of updates}</a>%j
+<li>{the} <a href="%sm=CAL">Kalender</a>
+<li>{the <a href="%sm=FORUM"><font color=green><b>GeneWeb</b></font>
+forum</a>}
 </ul>
 </td>
 </tr>

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.150 1999-10-21 18:17:59 ddr Exp $
+# $Id: lexicon.txt,v 2.150.2.1 1999-10-22 15:38:52 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -692,7 +692,7 @@ de: Erweiterte Suche
 dk: avanceret s&oslash;gning
 en: advanced request
 es: consulta avanzada
-eo: progresata rekesto
+eo: rekesto progresata
 fr: requ&ecirc;te &eacute;volu&eacute;e
 he:   בקשה מתקדמת 
 it: richiesta avanzata
@@ -1178,6 +1178,7 @@ se: begravd
 de: Kalender
 dk: kalender/kalendere
 en: calendar/calendars
+eo: kalendaro/kalendaroj
 fr: calendrier/calendriers
 nl: kalender/kalenders
 no: kalender/kalendere
@@ -1867,6 +1868,8 @@ se: f&ouml;r f&ouml;rnamnen i bokstavsordning
     forum
 dk: forum
 en: forum
+eo: forumo
+es: forum
 fr: forum
 nl: forum
 no: forum
@@ -2027,6 +2030,7 @@ se: hans maka/hennes make
     history of updates
 dk: opdateringers historie
 en: history of updates
+eo: historio de la gxisdatigoj
 fr: historique des mises-&agrave;-jour
 nl: lijst van wijzigingen
 no: oppdateringshistorie
@@ -4082,7 +4086,7 @@ cs: poslednם %d narozenם
 de: die letzen %d Geburten
 dk: de seneste %d f&oslash;dsler
 en: the latest %d births
-eo: la finaj %d naskigxoj
+eo: la lastaj %d naskigxoj
 es: los %d nacimientos m&aacute;s recientes
 fr: les %d derni&egrave;res naissances
 he:  %d הלידות האחרונות
@@ -4097,7 +4101,7 @@ cs: poslednם %d תmrtם
 de: die letzen %d Ableben
 dk: de seneste %d d&oslash;dsfald
 en: the latest %d deaths
-eo: la finaj %d mortoj
+eo: la lastaj %d mortoj
 es: las %d muertes m&aacute;s recientes
 fr: les %d derniers d&eacute;c&egrave;s
 he:  %d המתים האחרונים

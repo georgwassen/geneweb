@@ -15,7 +15,7 @@
 height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=center>
-<h1><font color=green>[Genealogical<br>data base]</font></h1>
+<h1><font color=green>{Genealogical<br>data base}</font></h1>
 </td>
 </tr>
 </table>
@@ -26,19 +26,19 @@ height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-Databáze <font color=green><b>"%t"</b></font> nyní obsahuje %n osob%o<br>
-(<a href="%sm=NOTES">[note/notes]1</a>)%o.
+Databáze <font color=green><b>"%t"</b></font> nyní obsahuje %n osob.%o<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%o
 
 %y<br><p>
 
 <table border=0 width="70%">
 <tr>
 
-<td align=center><a href="%sw=w">[<em>Wizard</em></a> access<br>
-(password)]</td>
+<td align=center><a href="%sw=w">{<em>Wizard</em></a> access<br>
+(password)}</td>
 
-%y%z<td align=center><a href="%sw=f">[<em>Friend</em></a> access<br>
-(password)]</td>
+%y%z<td align=center><a href="%sw=f">{<em>Friend</em></a> access<br>
+(password)}</td>
 
 %z%y</tr></table>
 
@@ -59,7 +59,7 @@ Databáze <font color=green><b>"%t"</b></font> nyní obsahuje %n osob%o<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-[To navigate in this data base, you can do your search]:<br><br>
+{To navigate in this data base, you can do your search}:<br><br>
 
 
 
@@ -69,7 +69,7 @@ Databáze <font color=green><b>"%t"</b></font> nyní obsahuje %n osob%o<br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=green><b>[by person]</b></font>
+<font color=green><b>{by person}</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -92,7 +92,7 @@ Databáze <font color=green><b>"%t"</b></font> nyní obsahuje %n osob%o<br>
 <font color=green><b>podle titulu</b></font>
 <input name=t size=14 maxlength=200>
 <font color=green><b>místa</b></font>
-<input name=p size=25 maxlength=200> =&gt;
+<input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
 </form>
 
@@ -100,7 +100,7 @@ Databáze <font color=green><b>"%t"</b></font> nyní obsahuje %n osob%o<br>
 
 <form method=GET action="%f">
 %h
-<font color=green><b>[by the list]</font></b> [of all]
+<font color=green><b>{by the list}</b></font> {of all}
 <select name=m>
 <option value="N" selected>pøíjmení
 <option value="P">køestní jména
@@ -109,29 +109,30 @@ seøazená podle
 <select name=tri>
 <option value="A" selected>abecedy
 <option value="F">èetnosti
-</select> =&gt;
+</select>
 <input type=submit VALUE="Ok">
 </form>
 
-<li>[by the] <a href="%sm=H;v=advanced"><font color=green><b>pokroèilý
+<li><font color=green><b>{by the}</b></font>
+<a href="%sm=H;v=advanced"><font color=green><b>pokroèilý
 dotaz</b></font></a>.
 
 </ul>
 
 %w<p>
 
-<center>[You can]<br><br>
+<center>{You can}<br><br>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
-<li><a href="%sm=ADD_FAM">[add a family]</a>
+<li><a href="%sm=ADD_FAM">{add a family}</a>
 </ul>
 </td>
 <td align=left>
 <ul>
-<li><a href="%sm=MOD_NOTES">[modify the notes]</a>
+<li><a href="%sm=MOD_NOTES">{modify the notes}</a>
 </ul>
 </td>
 </tr>
@@ -140,25 +141,25 @@ dotaz</b></font></a>.
 <br>
 %w
 
-<center>[You can also consult]<br><br>
+<center>{You can also consult}<br><br>
 
 <table border=0>
 <tr>
 <td valign=up>
 <ul>
-<li>[the] <a href="%sm=AN">výroèí narozenin</a>
-<li>[the] <a href="%sm=AD">výroèí úmrtí</a>
-<li>[the] <a href="%sm=AM">výroèí sòatkù</a>%x
-<li>[the] <a href="%sm=LB;k=10">nedávná narození</a>%x
+<li>{the} <a href="%sm=AN">výroèí narozenin</a>
+<li>{the} <a href="%sm=AD">výroèí úmrtí</a>
+<li>{the} <a href="%sm=AM">výroèí sòatkù</a>%x
+<li>{the} <a href="%sm=LB;k=10">nedávná narození</a>%x
 </ul>
 </td>
 <td valign=up>
 <ul>%x
-<li>[the] <a href="%sm=LD;k=10">nedávná úmrtí</a>%x%j
-<li>[the] <a href="%sm=HIST;k=10">[history of updates]</a>%j
-<li>[the] <a href="%sm=CAL">[calendars]</a>
-<li>[the] <a href="%sm=FORUM">[<font color=green><b>GeneWeb</b></font>
-forum]</a>
+<li>{the} <a href="%sm=LD;k=10">nedávná úmrtí</a>%x%j
+<li>{the} <a href="%sm=HIST;k=10">{history of updates}</a>%j
+<li>{the} <a href="%sm=CAL">{calendars}</a>
+<li>{the} <a href="%sm=FORUM">{<font color=green><b>GeneWeb</b></font>
+forum}</a>
 </ul>
 </td>
 </tr>

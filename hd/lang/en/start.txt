@@ -26,8 +26,8 @@ height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-The data base <font color=green><b>"%t"</b></font> now holds %n persons%o<br>
-(<a href="%sm=NOTES">[note/notes]1</a>)%o.
+The data base <font color=green><b>"%t"</b></font> now holds %n persons.%o<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%o
 
 %y<br><p>
 
@@ -47,7 +47,7 @@ The data base <font color=green><b>"%t"</b></font> now holds %n persons%o<br>
 <table border=0>
 <tr><td align=center>
 <form method=get action="%f">
-%hPassword, for <em>friend</em> or <em>wizard</em> access:</em>:
+%hPassword, for <em>friend</em> or <em>wizard</em> access:
 <input name=w size=10 maxlength=200>
 </form>
 </td></tr>
@@ -90,7 +90,7 @@ To navigate in this data base, you can do your search:<br><br>
 <font color=green><b>by title</b></font>
 <input name=t size=14 maxlength=200>
 <font color=green><b>place</b></font>
-<input name=p size=25 maxlength=200> =&gt;
+<input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
 </form>
 
@@ -98,7 +98,7 @@ To navigate in this data base, you can do your search:<br><br>
 
 <form method=GET action="%f">
 %h
-<font color=green><b>by the list</font></b> of all
+<font color=green><b>by the list</b></font> of all
 <select name=m>
 <option value="N" selected>surnames
 <option value="P">first names
@@ -107,11 +107,14 @@ by
 <select name=tri>
 <option value="A" selected>alphabetic order
 <option value="F">frequency
-</select> =&gt;
+</select>
 <input type=submit value="Ok">
 </form>
 
-<li> by the <a href="%sm=H;v=advanced"><font color=green><b>advanced
+<li>
+
+<font color=green><b>by the</b></font>
+<a href="%sm=H;v=advanced"><font color=green><b>advanced
 request</b></font></a>.
 
 </ul>
