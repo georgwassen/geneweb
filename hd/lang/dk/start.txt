@@ -87,12 +87,15 @@ eller <em>Sosa-nummer</em>, refererende til %a%u
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-
 <font color=green><b>{by} adelstitel</b></font>
 <input name=t size=14 maxlength=200>
 <font color=green><b>navn</b></font>
 <input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
+<br>
+ex:
+<font color=green><b>adelstitel</b></font>: roi, duke...
+<font color=green><b>navn</b></font>: de France, of Sax...
 </form>
 
 <li>

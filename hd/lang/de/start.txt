@@ -90,9 +90,13 @@ z.Zt. %n Personen.%o<br>
 %h<input type=hidden name=m value=TT>
 <font color=green><b>bei Titel</b></font>
 <input name=t size=14 maxlength=200>
-<font color=green><b>Platz</b></font>
+<font color=green><b>Ort</b></font>
 <input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
+<br>
+ex:
+<font color=green><b>[title/titles]</b></font>: roi, duke...
+<font color=green><b>[place]</b></font>: de France, of Sax...
 </form>
 
 <li>

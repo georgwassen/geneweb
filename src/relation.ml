@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.33.2.1 1999-10-23 21:07:18 ddr Exp $ *)
+(* $Id: relation.ml,v 2.33.2.2 1999-10-25 04:14:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -160,23 +160,17 @@ value print_menu conf base p =
          tag "tr" begin
            tag "td" "align=right" begin
              Wserver.wprint "%s\n" (capitale (transl conf "long display"));
-             Wserver.wprint "<input type=checkbox name=long value=on>";
+             Wserver.wprint "<input type=checkbox name=long value=on><br>\n";
+             Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
+             Wserver.wprint "<input type=checkbox name=spouse value=on><br>\n";
            end;
            tag "td" "align=right" begin
              Wserver.wprint "%s\n"
                (capitale (transl conf "relationships by marriage"));
-             Wserver.wprint "<input type=checkbox name=marr value=on>\n";
-           end;
-         end;
-         tag "tr" begin
-           tag "td" "align=right" begin
-             Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
-             Wserver.wprint "<input type=checkbox name=spouse value=on>\n";
-           end;
-           tag "td" "align=right" begin
+             Wserver.wprint "<input type=checkbox name=marr value=on><br>\n";
              Wserver.wprint "%s\n"
                (capitale (transl conf "cancel GeneWeb links"));
-             Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
+             Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
            end;
          end;
          tag "tr" begin
@@ -404,7 +398,7 @@ value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
        else s
      in
      stag "strong" begin
-       Wserver.wprint "%s" s;
+       Wserver.wprint "%s" (std_color s);
      end;
      Wserver.wprint "\n";
      let s = gen_person_text_without_title raw_access conf base p2 in
@@ -778,7 +772,7 @@ value print_path conf base i p1 p2 (pp1, pp2, (l1, l2, list)) =
 
 value print_main_relationship conf base long p1 p2 rel =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
-  do header conf title;
+  do cheader conf title;
      match p_getenv conf.env "spouse" with
      [ Some "on" -> conf.senv := conf.senv @ [("spouse", "on")]
      | _ -> () ];

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.52.2.6 1999-10-24 16:25:27 ddr Exp $ *)
+(* $Id: util.ml,v 2.52.2.7 1999-10-25 04:14:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -94,14 +94,6 @@ value p_getint env label =
   match p_getenv env label with
   [ Some s -> try Some (int_of_string (strip_spaces s)) with _ -> None
   | None -> None ]
-;
-
-value lendemain (j, m, a) =
-  let (jour, r) =
-    if j >= nb_jours_dans_mois m a then (1, 1) else (succ j, 0)
-  in
-  let (mois, r) = if m + r > 12 then (1, 1) else (m + r, 0) in
-  let annee = a + r in (jour, mois, annee)
 ;
 
 value parent_has_title base p =

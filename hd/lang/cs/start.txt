@@ -94,6 +94,10 @@ Databáze <font color=green><b>"%t"</b></font> nyní obsahuje %n osob.%o<br>
 <font color=green><b>místa</b></font>
 <input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
+<br>
+ex:
+<font color=green><b>[title/titles]</b></font>: roi, duke...
+<font color=green><b>[place]</b></font>: de France, of Sax...
 </form>
 
 <li>

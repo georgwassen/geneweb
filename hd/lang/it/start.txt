@@ -92,6 +92,10 @@ attualmente %n persone.%o<br> (<a href="%sm=NOTES">[note/notes]1</a>)%o
 <font color=green><b>luogo</b></font>
 <input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
+<br>
+ex:
+<font color=green><b>[title/titles]</b></font>: roi, duke...
+<font color=green><b>[place]</b></font>: de France, of Sax...
 </form>
 
 <li>

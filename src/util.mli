@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.31.2.5 1999-10-24 16:25:28 ddr Exp $ *)
+(* $Id: util.mli,v 2.31.2.6 1999-10-25 04:14:52 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -20,7 +20,6 @@ value commd : config -> string;
 value code_varenv : string -> string;
 value decode_varenv : string -> string;
 
-value lendemain : (int * int * int) -> (int * int * int);
 value age_autorise : config -> base -> person -> bool;
 
 value enter_nobr : unit -> unit;

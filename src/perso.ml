@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.52.2.6 1999-10-24 13:56:16 ddr Exp $ *)
+(* $Id: perso.ml,v 2.52.2.7 1999-10-25 04:14:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1010,16 +1010,19 @@ value print_photo_occupation_dates conf base p =
 ;
 
 value print_ancestors_descends_cousins conf base p a =
-  let st = ref False in
-  let head () =
-    if not st.val then
-      do Wserver.wprint "<td align=left><br>\n<ul>\n";
-         st.val := True;
-      return ()
-    else ()
+  let (open_area, close_area) =
+    let opened = ref False in
+    (fun () ->
+       if not opened.val then
+         do Wserver.wprint "<td align=left><p><br>\n<ul>\n";
+            opened.val := True;
+         return ()
+       else (),
+     fun () ->
+       if opened.val then Wserver.wprint "</ul>\n</td>\n" else ())
   in
   let print p mode txt =
-    do head ();
+    do open_area ();
        html_li conf;
        print_compute_link conf base p mode txt;
        Wserver.wprint "\n";
@@ -1043,7 +1046,7 @@ value print_ancestors_descends_cousins conf base p a =
      [ Some p ->
          print p "" (transl_nth conf "next sibling" (index_of_sex p.sex))
      | None -> () ];
-     if st.val then Wserver.wprint "</ul>\n</td>\n" else ();
+     close_area ();
   return ()
 ;
 
@@ -1086,11 +1089,11 @@ value print conf base p =
      else
        do tag "table" "border=%d width=\"90%%\"" conf.border begin
             tag "tr" begin
-              stag "td" "align=center" begin
+              tag "td" "align=center" begin
                 print_compute_link conf base p "R"
                   (transl conf "relationship computing");
+                Wserver.wprint "\n";
               end;
-              Wserver.wprint "\n";
               print_ancestors_descends_cousins conf base p a;
               if conf.wizard then
                 do stag "td" "align=center" begin
