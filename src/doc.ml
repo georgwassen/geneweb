@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 2.7.2.2 1999-10-25 15:20:27 ddr Exp $ *)
+(* $Id: doc.ml,v 2.7.2.3 1999-10-26 06:42:45 ddr Exp $ *)
 
 open Config;
 
@@ -10,7 +10,7 @@ value start_with s i p =
 value last_is s i p =
   loop i (String.length p - 1) where rec loop i k =
     if i <= 0 then False
-    else if k <= 0 then True
+    else if k < 0 then True
     else
       let c = Char.lowercase s.[i] in
       let c = if c = '\n' || c = '\r' then ' ' else c in
@@ -41,7 +41,7 @@ value copy conf pref_doc pref_img s =
            else Wserver.wprint "%s" pref_doc;
         return
         loop i
-      else if last_is s i "src=" || last_is s i "background=" then
+      else if last_is s i " src=" || last_is s i " background=" then
         let i = do Wserver.wprint "="; return i + 1 in
         let (img, i) =
           if s.[i] = '"' then
