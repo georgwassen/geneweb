@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.55 1999-10-08 10:19:48 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.55.2.1 1999-10-23 13:21:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -400,7 +400,7 @@ value print_person_long_info conf base auth link p =
           Wserver.wprint "</em>";
        return ()
      else ();
-     if auth then Perso.print_dates conf base False p else ();
+     if auth then Date.print_dates conf base p else ();
      let occu = sou base p.occupation in
      if auth && link = None && occu <> "" then
        Wserver.wprint ", %s" occu

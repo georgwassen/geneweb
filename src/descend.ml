@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.31 1999-10-08 10:19:50 ddr Exp $ *)
+(* $Id: descend.ml,v 2.31.2.1 1999-10-23 13:21:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -169,7 +169,7 @@ value afficher_marie conf base first fam p spouse =
      stag "strong" begin
        afficher_personne_referencee conf base spouse;
      end;
-     if auth then Perso.print_dates conf base False spouse else ();
+     if auth then Date.print_dates conf base spouse else ();
      if auth then
        match fam.divorce with
        [ NotDivorced -> ()
@@ -194,7 +194,7 @@ value print_child conf base levt boucle niveau_max niveau compte auth ix =
          afficher_prenom_de_personne_referencee conf base x
        else afficher_personne_referencee conf base x;
      end;
-     if auth then Perso.print_dates conf base False x else ();
+     if auth then Date.print_dates conf base x else ();
      if levt.(Adef.int_of_iper x.cle_index) < niveau then
        Wserver.wprint "<em>, %s</em>"
          (transl conf "see further")
@@ -282,7 +282,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
      stag "strong" begin
        afficher_personne_referencee conf base p;
      end;
-     if age_autorise conf base p then Perso.print_dates conf base False p
+     if age_autorise conf base p then Date.print_dates conf base p
      else ();
      Wserver.wprint ".";
      html_br conf;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.52.2.3 1999-10-23 04:50:37 ddr Exp $ *)
+(* $Id: util.ml,v 2.52.2.4 1999-10-23 13:21:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1357,6 +1357,12 @@ value print_pre_right sz txt =
        for i = 1 to sz - pre_text_size txt - 1 do Wserver.wprint " "; done;
      Wserver.wprint " %s\n" txt;
   return ()
+;
+
+value of_course_died conf p =
+  match Adef.od_of_codate p.birth with
+  [ Some (Dgreg d _) -> conf.today.year - d.year > 120
+  | _ -> False ]
 ;
 
 (* Deprecated *)

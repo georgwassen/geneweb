@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.31.2.2 1999-10-23 04:50:38 ddr Exp $ *)
+(* $Id: util.mli,v 2.31.2.3 1999-10-23 13:21:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -77,6 +77,7 @@ value default_body_prop : config -> string;
 
 value print_alphab_list :
   config -> ('a -> string) -> ('a -> unit) -> list 'a -> unit;
+value of_course_died : config -> person -> bool;
 
 value surname_begin : string -> string;
 value surname_end : string -> string;
