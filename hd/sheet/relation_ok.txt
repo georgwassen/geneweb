@@ -1,4 +1,4 @@
-<comm e="$Id: relation_ok.txt,v 1.1.2.3 1999-04-09 05:00:12 ddr Exp $">
+<comm e="$Id: relation_ok.txt,v 1.1.2.4 1999-04-10 06:40:47 ddr Exp $">
 <comm e="Copyright (c) 1999 INRIA">
 <comm
   Context:
@@ -25,6 +25,7 @@
   <title><eval transl "Relationship"></title>
 </head>
 <body>
+
 <h1><eval transl "Relationship"></h1>
 
 <match result>
@@ -87,7 +88,7 @@
       <with _>xxx (<eval n1> <eval n2>)
       </match>
     </strong>
-    <if n1 \> n2><eval transl_nth "of (person of lower generation level)" 0>
+    <if n1 GT n2><eval transl_nth "of (person of lower generation level)" 0>
     <else><eval transl_nth "of" 0></if>
     <match main_title p1>
     <with Some t>

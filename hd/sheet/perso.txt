@@ -1,4 +1,4 @@
-<comm e="$Id: perso.txt,v 1.1.2.6 1999-04-09 20:28:12 ddr Exp $">
+<comm e="$Id: perso.txt,v 1.1.2.7 1999-04-10 06:40:46 ddr Exp $">
 <comm e="Copyright (c) 1999 INRIA">
 <comm
   Context:
@@ -196,6 +196,20 @@
     <else><eval ondate d>.
     </if>
     </em><br>
+  <with DeadYoung><em><eval transl_nth "Dead young" (sex p)>.</em><br>
+  <with DeadDontKnowWhen>
+    <if death_place p != "">
+      <em><eval transl_nth "Died" (sex p)> - <eval death_place p>.</em><br>
+    <else>
+      <match (birth_date p)>
+      <with (Some d)>
+        <let (_, _, y) = passed_time d today>
+        <if y LT 120>
+          <em><eval transl_nth "Died" (sex p)>.</em><br>
+        </if>
+      <with None><em><eval transl_nth "Died" (sex p)>.</em><br>
+      </match>
+    </if>
   </match>
 </if>
 
@@ -262,7 +276,6 @@
 
 <match parents p>
 <with Some fam>
-  <p>
   <h3><eval transl "Parents"></h3>
   <ul>
   <for p in [father fam; mother fam]>
@@ -357,7 +370,8 @@
       </ul>
     </if>
   </for>
-  </ul><p>
+  </ul>
+  <p>
 </match>
 
 <if auth p>
@@ -365,7 +379,8 @@
     <h3><eval transl_nth "Note/notes" 1></h3>
     <ul><li>
     <eval notes p>
-    </ul><p>
+    </ul>
+    <p>
   </if>
 </if>
 
@@ -382,9 +397,10 @@
     <a href="`commd``access p`;m=D"><eval transl "Descendants"></a> /
   </if>
   <if has_grand_parents p>
-    <a href="`commd``access p`;m=C"><eval transl "Cousins"></a> /
+    <a href="`commd``access p`;m=C"><eval transl "Cousins (general term)"></a> /
   </if>
   </h4>
+  <p>
 </if>
 
 <if is_wizard>

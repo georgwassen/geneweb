@@ -1,9 +1,9 @@
 (* camlp4r *)
-(* $Id: pXML.ml,v 1.1.2.2 1999-04-08 21:18:23 ddr Exp $ *)
+(* $Id: pXML.ml,v 1.1.2.3 1999-04-10 06:40:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type xast =
-  [ Xtag of string and list (string * string)
+  [ Xtag of string and string
   | Xetag of string
   | Xtext of string
   | Xind of int ]
@@ -39,50 +39,26 @@ value rec string q len =
   | [: `x; strm :] -> string q (store len x) strm ]
 ;
 
-value rec atom len =
+value rec skip_spaces =
   parser
-  [ [: `x when x <> '>' && x <> ' '; strm :] -> atom (store len x) strm
-  | [: :] -> get_buff len ]
+  [ [: `' '|'\t'|'\n'; strm :] -> skip_spaces strm
+  | [: :] -> () ]
 ;
 
-value expr =
-  parser
-  [ [: `('"' | ''' | '`' as q); len = string q (store 0 q) :] -> get_buff len
-  | [: e = atom 0 :] -> e ]
-;
-
-value rec any len =
-  parser
-  [ [: `'\\'; `c; strm :] -> any (store len c) strm
-  | [: `('"' | ''' | '`' as q); strm :] ->
-      any (string q (store len q) strm) strm
-  | [: `x when x <> '>'; strm :] -> any (store len x) strm
+value rec any len strm =
+  match strm with parser
+  [ [: `'\\'; `c :] -> any (store len c) strm
+  | [: `('"' | ''' | '`' as q) :] -> any (string q (store len q) strm) strm
+  | [: `(' '|'\t'|'\n' as c); _ = skip_spaces :] -> any (store len ' ') strm
+  | [: `x when x <> '>' :] -> any (store len x) strm
   | [: :] -> len ]
-;
-
-value env strm =
-  List.rev (loop [] strm) where rec loop bind =
-    parser
-    [ [: `' '|'\n' :] -> loop bind strm
-    | [: p = ident 0;
-         r =
-           parser
-           [ [: `'='; e = expr :] ->
-               loop [(p, e) :: bind] strm
-           | [: len = any 0 :] -> [("_", p ^ get_buff len) :: bind] ]
-      :] -> r
-    | [: `('"' | ''' | '`' as q); len = string q (store 0 q) :] ->
-        [("_", get_buff len) :: bind]
-    | [: len = any 0 :] ->
-        if len = 0 then bind else [("_", get_buff len) :: bind]
-    | [: :] -> bind ]
 ;
 
 value tag =
   parser
   [ [: `'/'; t = ident 0?"ident expected" :] -> Xetag t
-  | [: t = ident 0; e = env :] -> Xtag t e
-  | [: `'!'; len = any (store 0 '!') :] -> Xtag (get_buff len) [] ]
+  | [: t = ident 0; _ = skip_spaces; len = any 0 :] -> Xtag t (get_buff len)
+  | [: `'!'; len = any (store 0 '!') :] -> Xtag (get_buff len) "" ]
 ;
 
 value rec text len =

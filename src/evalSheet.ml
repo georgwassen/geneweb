@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: evalSheet.ml,v 1.1.2.6 1999-04-09 14:09:27 ddr Exp $ *)
+(* $Id: evalSheet.ml,v 1.1.2.7 1999-04-10 06:40:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -15,13 +15,13 @@ type statement =
 
 value stop_match_case =
   fun
-  [ PXML.Xtag "with" [(_, _)] | PXML.Xetag "match" -> True
+  [ PXML.Xtag "with" _ | PXML.Xetag "match" -> True
   | _ -> False ]
 ;
 
 value stop_if =
   fun
-  [ PXML.Xtag "else" [] | PXML.Xetag "if" -> True
+  [ PXML.Xtag "else" "" | PXML.Xetag "if" -> True
   | _ -> False ]
 ;
 
@@ -31,15 +31,15 @@ value rec make_sequence stats xast =
   | None -> List.rev stats ]
 and make_statement =
   fun
-  [ [(PXML.Xtag "if" [(_, s)] as a) :: xast] ->
+  [ [(PXML.Xtag "if" s as a) :: xast] ->
       match make_if xast with
       [ Some (then_c, else_c, xast) -> Some (Sif s then_c else_c, xast)
       | None -> Some (Sxml a, xast) ]
-  | [(PXML.Xtag "for" [(_, s)] as a) :: xast] ->
+  | [(PXML.Xtag "for" s as a) :: xast] ->
       match make_sequence_upto_etag "for" [] xast with
       [ Some (statl, xast) -> Some (Sfor s statl, xast)
       | None -> Some (Sxml a, xast) ]
-  | [(PXML.Xtag "match" [(_, s)] as a) :: xast] ->
+  | [(PXML.Xtag "match" s as a) :: xast] ->
       match make_match [] xast with
       [ Some (cases, xast) -> Some (Smatch s cases, xast)
       | None -> Some (Sxml a, xast) ]
@@ -49,7 +49,7 @@ and make_if xast =
   match make_sequence_upto stop_if [] xast with
   [ Some (then_c, xast) ->
       match xast with
-      [ [PXML.Xtag "else" [] :: xast] ->
+      [ [PXML.Xtag "else" "" :: xast] ->
           match make_sequence_upto_etag "if" [] xast with
           [ Some (else_c, xast) -> Some (then_c, else_c, xast)
           | _ -> None ]
@@ -58,7 +58,7 @@ and make_if xast =
   | _ -> None ]
 and make_match cases =
   fun
-  [ [PXML.Xtag "with" [(_, p)] :: xast] -> make_match_case cases p xast
+  [ [PXML.Xtag "with" p :: xast] -> make_match_case cases p xast
   | [PXML.Xetag "match" :: xast] -> Some (List.rev cases, xast)
   | [PXML.Xtext _ | PXML.Xind _ :: xast] -> make_match cases xast
   | _ -> None ]
@@ -194,39 +194,50 @@ and eval_statement conf global env pend_nl statl =
       return ([], statl)
   | Sxml (PXML.Xtext s) ->
       do flush_nl pend_nl; wprint "%s" s; return ([], statl)
-  | Sxml (PXML.Xtag t tenv) ->
-      match (String.lowercase t, tenv) with
-      [ ("a" | "img", tenv) ->
-          do flush_nl pend_nl;
-             wprint "<%s" t;
-             List.iter
-               (fun (k, s) ->
-                  do wprint " %s=" k;
-                     eval_string_with_antiquot global env s;
-                  return ())
-               tenv;
-             wprint ">";
-          return ([], statl)
-      | ("comm", _) -> ([], statl)
-      | ("strip", _) -> ([], strip statl)
-      | ("eval", [(_, v)]) ->
-          do flush_nl pend_nl;
-             wprint "%s" (string_of_dyn (Eval.expr global env v));
-          return ([], statl)
-      | ("format", [(_, v)]) ->
-          Eval.wrap v
-            (fun () ->
-               do flush_nl pend_nl; return
-               ([], eval_format conf global env [] statl v))
-      | _ ->
-          do flush_nl pend_nl;
-             wprint "<%s" t;
-             List.iter (fun (p, e) -> wprint " %s=%s" p e) tenv;
-             wprint ">";
-          return ([], statl) ]
+  | Sxml (PXML.Xtag "body" "") ->
+      do flush_nl pend_nl;
+         let s =
+           try " dir=" ^ Hashtbl.find conf.Config.lexicon " !dir" with
+           [ Not_found -> "" ]
+         in
+         let s =
+           try s ^ " " ^ List.assoc "body_prop" conf.Config.base_env with
+           [ Not_found -> s ]
+         in
+         wprint "<body%s>" s;
+      return ([], statl)
   | Sxml (PXML.Xetag "body") ->
       let pend_nl = match pend_nl with [ [_ :: l] -> l | [] -> [] ] in
       do flush_nl pend_nl; trailer conf; return ([], strip statl)
+  | Sxml (PXML.Xtag t s) ->
+      match String.lowercase t with
+      [ "a" | "img" ->
+          do flush_nl pend_nl;
+             wprint "<%s" t;
+             if s = "" then ()
+             else
+               do wprint " ";
+                  eval_string_with_antiquot global env s;
+               return ();
+             wprint ">";
+          return ([], statl)
+      | "comm" -> ([], statl)
+      | "strip" -> ([], strip statl)
+      | "eval" ->
+          do flush_nl pend_nl;
+             wprint "%s" (string_of_dyn (Eval.expr global env s));
+          return ([], statl)
+      | "format" ->
+          Eval.wrap s
+            (fun () ->
+               do flush_nl pend_nl; return
+               ([], eval_format conf global env [] statl s))
+      | _ ->
+          do flush_nl pend_nl;
+             wprint "<%s" t;
+             if s = "" then () else wprint " %s" s;
+             wprint ">";
+          return ([], statl) ]
   | Sxml (PXML.Xetag t) ->
       do flush_nl pend_nl; wprint "</%s>" t; return ([], statl)
   | Sxml (PXML.Xind ind) ->
@@ -312,6 +323,7 @@ value f conf base env fname =
     List.fold_right Filename.concat [Util.lang_dir.val; "sheet"]
       (fname ^ ".txt")
   in
+  do Util.html conf; return
   try
     let xast =
       let ic = open_in fname in

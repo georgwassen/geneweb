@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: eval.ml,v 1.1.2.5 1999-04-09 20:28:12 ddr Exp $ *)
+(* $Id: eval.ml,v 1.1.2.6 1999-04-10 06:40:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -82,7 +82,7 @@ GEXTEND G
     | [ e1 = expr; "AND"; e2 = expr -> <:expr< $e1$ && $e2$ >> ]
     | [ e1 = expr; "!="; e2 = expr -> <:expr< $e1$ <> $e2$ >>
       | e1 = expr; "="; e2 = expr -> <:expr< $e1$ = $e2$ >>
-      | e1 = expr; ">"; e2 = expr -> <:expr< $e1$ > $e2$ >>
+      | e1 = expr; "LT"; e2 = expr -> <:expr< $e1$ < $e2$ >>
       | e1 = expr; "GT"; e2 = expr -> <:expr< $e1$ > $e2$ >> ]
     | [ e1 = expr; "+"; e2 = expr -> <:expr< $e1$ + $e2$ >>
       | e1 = expr; "-"; e2 = expr -> <:expr< $e1$ - $e2$ >>
@@ -303,8 +303,10 @@ do Printf.eprintf "... binding %s\n" s; flush stderr; return
         | (Murdered, <:patt< Murdered >>) -> Some []
         | (Killed, <:patt< Killed >>) -> Some []
         | (Executed, <:patt< Executed >>) -> Some []
+        | (Disappeared, <:patt< Disappeared >>) -> Some []
         | (_, <:patt< Unspecified >> | <:patt< Murdered >>) -> None
         | (_, <:patt< Killed >> | <:patt< Executed >>) -> None
+        | (_, <:patt< Disappeared >>) -> None
         | _ ->
             eval_err "matching a death_reason type with incompatible pattern" ]
     | (<:ctyp< burial >>, p) ->

@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: global.ml,v 1.1.2.4 1999-04-09 20:28:12 ddr Exp $ *)
+(* $Id: global.ml,v 1.1.2.5 1999-04-10 06:40:47 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -467,6 +467,10 @@ value table =
      ("<>",
       (fun conf base ->
          Obj.repr (fun x y -> x <> y : 'a -> 'a -> bool),
+       <:ctyp< 'a -> 'a -> bool >>));
+     ("<",
+      (fun conf base ->
+         Obj.repr (fun x y -> x < y : 'a -> 'a -> bool),
        <:ctyp< 'a -> 'a -> bool >>));
      (">",
       (fun conf base ->
