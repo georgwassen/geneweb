@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.4.2.4 1999-04-11 01:19:13 ddr Exp $
+# $Id: Makefile,v 2.4.2.5 1999-04-11 19:28:12 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -75,6 +75,8 @@ def.cmo: def.mli
 	@$(CAMLP4_COMM) $(CAMLP4F) -o $*.ppo -impl $<
 	$(OCAMLC) $(OCAMLI) -I $(CAMLP4D) -c -impl $*.ppo
 	$(RM) $*.ppo
+../hd/sheet/s_perso.cmo: pa_sheet.cma
+../hd/sheet/s_relation.cmo: pa_sheet.cma
 
 .SUFFIXES: .txt
 

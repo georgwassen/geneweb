@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: pXML.ml,v 1.1.2.4 1999-04-11 01:19:14 ddr Exp $ *)
+(* $Id: pXML.ml,v 1.1.2.5 1999-04-11 19:28:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type xast =
@@ -19,6 +19,12 @@ value store len x =
 ;
 value get_buff len = String.sub buff.val 0 len;
 
+value rec skip_spaces =
+  parser
+  [ [: `' '|'\t'|'\n'; strm :] -> skip_spaces strm
+  | [: :] -> () ]
+;
+
 value rec ident len =
   parser
   [ [: `('a'..'z' | 'A'..'Z' | '0'..'9' | '_' as c);
@@ -33,16 +39,11 @@ value rec string q len =
       let c =
         match c with
         [ 'n' -> '\n'
+        | '\n' -> do skip_spaces strm; return Stream.next strm
         | _ -> c ]
       in
       string q (store len c) strm
   | [: `x; strm :] -> string q (store len x) strm ]
-;
-
-value rec skip_spaces =
-  parser
-  [ [: `' '|'\t'|'\n'; strm :] -> skip_spaces strm
-  | [: :] -> () ]
 ;
 
 value rec any len strm =

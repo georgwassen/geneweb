@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: evalSheet.ml,v 1.1.2.8 1999-04-11 01:19:13 ddr Exp $ *)
+(* $Id: evalSheet.ml,v 1.1.2.9 1999-04-11 19:28:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -7,6 +7,7 @@ open Util;
 type statement =
   [ Sif of string and list statement and list statement
   | Sfor of string and list statement
+  | Sformat of string and list statement
   | Smatch of string and list (string * list statement)
   | Sxml of PXML.xast ]
 ;
@@ -38,6 +39,10 @@ and make_statement =
   | [(PXML.Xtag "for" s as a) :: xast] ->
       match make_sequence_upto_etag "for" [] xast with
       [ Some (statl, xast) -> Some (Sfor s statl, xast)
+      | None -> Some (Sxml a, xast) ]
+  | [(PXML.Xtag "format" s as a) :: xast] ->
+      match make_sequence_upto_etag "format" [] xast with
+      [ Some (statl, xast) -> Some (Sformat s statl, xast)
       | None -> Some (Sxml a, xast) ]
   | [(PXML.Xtag "match" s as a) :: xast] ->
       match make_match [] xast with
@@ -97,6 +102,8 @@ value setindent ind statl =
         Sif e (List.map do_stat then_c) (List.map do_stat else_c)
     | Sfor e body ->
         Sfor e (List.map do_stat body)
+    | Sformat e body ->
+        Sformat e (List.map do_stat body)
     | Smatch e casel ->
         Smatch e (List.map do_match_case casel)
     | Sxml (PXML.Xind ind0) as a ->
@@ -189,23 +196,13 @@ and eval_statement conf global env pend_nl statl =
       ([], statl)
   | Sfor e body ->
       do eval_for conf global env pend_nl e body; return ([], statl)
+  | Sformat e body ->
+      do eval_format conf global env pend_nl e body; return ([], statl)
   | Smatch e pwel ->
       do eval_match conf global env pend_nl (Eval.expr global env e) pwel;
       return ([], statl)
   | Sxml (PXML.Xtext s) ->
       do flush_nl pend_nl; wprint "%s" s; return ([], statl)
-  | Sxml (PXML.Xtag "body" "") ->
-      do flush_nl pend_nl;
-         let s =
-           try " dir=" ^ Hashtbl.find conf.Config.lexicon " !dir" with
-           [ Not_found -> "" ]
-         in
-         let s =
-           try s ^ " " ^ List.assoc "body_prop" conf.Config.base_env with
-           [ Not_found -> s ]
-         in
-         wprint "<body%s>" s;
-      return ([], statl)
   | Sxml (PXML.Xetag "body") ->
       let pend_nl = match pend_nl with [ [_ :: l] -> l | [] -> [] ] in
       do flush_nl pend_nl; trailer conf; return ([], strip statl)
@@ -221,17 +218,25 @@ and eval_statement conf global env pend_nl statl =
                return ();
              wprint ">";
           return ([], statl)
+      | "body" when s = "" ->
+          do flush_nl pend_nl;
+             let s =
+               try " dir=" ^ Hashtbl.find conf.Config.lexicon " !dir" with
+               [ Not_found -> "" ]
+             in
+             let s =
+               try s ^ " " ^ List.assoc "body_prop" conf.Config.base_env with
+               [ Not_found -> s ]
+             in
+             wprint "<body%s>" s;
+          return ([], statl)
       | "comm" -> ([], statl)
-      | "strip" -> ([], strip statl)
       | "eval" ->
           do flush_nl pend_nl;
              wprint "%s" (string_of_dyn (Eval.expr global env s));
           return ([], statl)
-      | "format" ->
-          Eval.wrap s
-            (fun () ->
-               do flush_nl pend_nl; return
-               ([], eval_format conf global env [] statl s))
+      | "let" -> eval_let conf global env pend_nl statl s
+      | "strip" -> ([], strip statl)
       | _ ->
           do flush_nl pend_nl;
              wprint "<%s" t;
@@ -242,8 +247,8 @@ and eval_statement conf global env pend_nl statl =
       do flush_nl pend_nl; wprint "</%s>" t; return ([], statl)
   | Sxml (PXML.Xind ind) ->
       ([ind :: pend_nl], statl) ]
-and eval_format conf global env pend_nl statl v =
-  let (fast, astl) = Eval.simple_expr_list v in
+and eval_format conf global env pend_nl s statl =
+  let (fast, astl) = Eval.simple_expr_list s in
   let x = Eval.eval_expr global env fast in
   match x.Eval.ctyp with
   [ <:ctyp< string >> ->
@@ -270,9 +275,9 @@ and eval_format conf global env pend_nl statl v =
           else
             do wprint "%c" f.[i]; return loop (i + 1) statl astl
         else if i + 1 = String.length f then
-          do wprint "%c" f.[i]; return statl
-        else statl
-  | t -> Eval.error v "format not of type string" (Some t) ]
+          wprint "%c" f.[i]
+        else ()
+  | t -> Eval.error s "format not of type string" (Some t) ]
 and eval_if conf global env pend_nl exp then_c else_c =
   let e = Eval.expr global env exp in
   match e.Eval.ctyp with
@@ -306,6 +311,14 @@ and eval_for conf global env pend_nl s body =
       in
       ()
   | t -> Eval.error s "for set is not of type list" (Some t) ]
+and eval_let conf global env pend_nl statl s =
+  let (p, e) = Eval.patt_eq_expr global env s in
+  let statl = strip statl in
+  match Eval.eval_matching global env e (p, None) with
+  [ Some new_env -> (eval_sequence conf global new_env pend_nl statl, [])
+  | None ->
+      Eval.error s "pattern type does not match expression type"
+        (Some e.Eval.ctyp) ]
 and eval_match conf global env pend_nl exp =
   fun
   [ [(p, statl) :: pwel] ->

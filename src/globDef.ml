@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: globDef.ml,v 1.1.2.1 1999-04-11 01:19:13 ddr Exp $ *)
+(* $Id: globDef.ml,v 1.1.2.2 1999-04-11 19:28:13 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -21,6 +21,10 @@ value wprint fmt = Wserver.wprint fmt;
 
 value indent ind =
   do wprint "\n"; for i = 1 to ind do wprint " "; done; return ()
+;
+
+value f_uncapitalize (s : format 'a 'b 'c) =
+  (Obj.magic String.uncapitalize (Obj.magic s) : format 'a 'b 'c)
 ;
 
 value access conf base p = Util.acces conf base p
@@ -57,6 +61,19 @@ and find_person_in_env conf base x = Util.find_person_in_env conf base x
 and first_name conf base p = Util.coa conf (sou base p.first_name)
 and first_names_aliases conf base p =
   List.map (fun s -> Util.coa conf (sou base s)) p.first_names_aliases
+and ftransl conf base s =
+  if String.length (Obj.magic s : string) > 0 then
+    match (Obj.magic s : string).[0] with
+    [ 'A'..'Z' -> Util.fcapitale (Util.ftransl conf (f_uncapitalize s))
+    | _ -> Util.ftransl conf s ]
+  else s
+and ftransl_nth conf base s i =
+  if String.length (Obj.magic s : string) > 0 then
+    match (Obj.magic s : string).[0] with
+    [ 'A'..'Z' ->
+        Util.fcapitale (Util.ftransl_nth conf (f_uncapitalize s) i)
+    | _ -> Util.ftransl_nth conf s i ]
+  else s
 and has_titles conf base p = List.length p.titles > 0
 and image conf base p = sou base p.image
 and image_file_name conf base s =
@@ -86,7 +103,6 @@ and modtime conf base f =
   int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))
 and month conf base d = d.month
 and mother conf base fam = poi base (coi base fam.fam_index).mother
-and not conf base = not
 and notes conf base p = Util.coa conf (sou base p.notes)
 and occupation conf base p = Util.coa conf (sou base p.occupation)
 and ondate conf base d = Date.string_of_ondate conf d
@@ -104,7 +120,7 @@ and qualifiers conf base p =
 and sex conf base p = Util.index_of_sex p.sex
 and spouse conf base p fam = poi base (Util.spouse p (coi base fam.fam_index))
 and string_length conf base s = String.length s
-and string_of_int conf base = Pervasives.string_of_int
+and string_of_num conf base = Num.to_string
 and string_of_num_sep conf base n =
   let r = ref "" in
   do Num.print (fun x -> r.val := r.val ^ x)

@@ -1,5 +1,5 @@
 <comm param = p>
-<comm $Id: s_perso.txt,v 1.1.2.1 1999-04-11 01:19:12 ddr Exp $>
+<comm $Id: s_perso.txt,v 1.1.2.2 1999-04-11 19:28:12 ddr Exp $>
 <comm Copyright (c) 1999 INRIA>
 <comm
   Context:
@@ -39,7 +39,8 @@
   <match find_sosa p d>
   <with Some n>
     <em>Sosa:
-    <a href="`commd`m=RL;i1=`index p`;i2=`index d`;b1=1;b2=`n`">
+    <a href="`commd`m=RL;i1=`string_of_int (index p)`;\
+     i2=`string_of_int (index d)`;b1=1;b2=`string_of_num n`">
     <eval string_of_num_sep n></a>
     </em><p>
   <with None>
@@ -64,17 +65,19 @@
     <with Some f>
       <match image_size f>
       <with Some (width, height)>
-        <img src="`commd`m=IM;v=`url_encode (basename f)`;d=`modtime f`"
-         width=`width` height=`height` alt="`transl \"image\"`">
-      <with None>
-        <img src="`commd`m=IM;v=`url_encode (basename f)`;d=`modtime f`"
+        <img src="`commd`m=IM;v=`url_encode (basename f)`;\
+         d=`string_of_int (modtime f)`"
+         width=`string_of_int width` height=`string_of_int height`
          alt="`transl \"image\"`">
+      <with None>
+        <img src="`commd`m=IM;v=`url_encode (basename f)`;\
+         d=`string_of_int (modtime f)`" alt="`transl \"image\"`">
       </match>
       <p>
     <with None>
     </match>
   <with s>
-    <if string_length s GT string_length "http://" AND
+  <if string_length s GT string_length "http://" AND
         string_sub s 0 (string_length "http://") = "http://">
       <img src=s alt="`transl \"image\"`">
       <p>
@@ -84,8 +87,8 @@
         <with Some fname>
            <match image_size fname>
            <with Some (width, height)>
-             <img src="`commd`m=IM;v=`s`" width=`width` height=`height`
-              alt="`transl \"image\"`">
+             <img src="`commd`m=IM;v=`s`" width=`string_of_int width`
+              height=`string_of_int height` alt="`transl \"image\"`">
            <with None>
              <img src="`commd`m=IM;v=`s`" alt="`transl \"image\"`">
            </match>
@@ -324,7 +327,7 @@
     <if are_not_married fam AND auth p AND auth (spouse p fam)>
       <eval transl "With">
     <else>
-      <format (transl_nth "Married%t to" (sex p))>
+      <format (ftransl_nth "Married%t to" (sex p))>
         <if auth p AND auth (spouse p fam)>
           <match (marriage_date fam, marriage_place fam)>
           <with (None, "")>
@@ -333,36 +336,36 @@
           <with (Some d, s)> <em><eval ondate d>, <eval s></em>,
           </match>
         </if>
+      </format>
     </if>
-    <for p in [spouse p fam]>
-      <a href="`commd``access p`">
-      <match main_title p>
-      <with Some t when not (is_private_access p)>
-        <eval titled_person_text p t></a>,
-        <em><eval title_ident t> <eval title_place t></em>
-      <with _><eval person_text p></a>
+    <let sp = spouse p fam>
+    <a href="`commd``access sp`">
+    <match main_title sp>
+    <with Some t when not (is_private_access sp)>
+      <eval titled_person_text sp t></a>,
+      <em><eval title_ident t> <eval title_place t></em>
+    <with _><eval person_text sp></a>
+    </match>
+    <if auth sp>
+      <match (birth_date sp, death sp)>
+      <with (Some bd, NotDead)> <em><eval year_p bd>-</em>
+      <with (Some bd, Death _ dd)> <em><eval year_p bd>-<eval year_p dd></em>
+      <with (Some bd, DeadYoung)> <em><eval year_p bd>+</em>
+      <with (Some bd, DeadDontKnowWhen)> <em><eval year_p bd>+</em>
+      <with (Some bd, DontKnowIfDead)> <em>*<eval year_p bd></em>
+      <with (_, Death _ dd)> <em>+<eval year_p dd></em>
+      <with _>
       </match>
-      <if auth p>
-        <match (birth_date p, death p)>
-        <with (Some bd, NotDead)> <em><eval year_p bd>-</em>
-        <with (Some bd, Death _ dd)> <em><eval year_p bd>-<eval year_p dd></em>
-        <with (Some bd, DeadYoung)> <em><eval year_p bd>+</em>
-        <with (Some bd, DeadDontKnowWhen)> <em><eval year_p bd>+</em>
-        <with (Some bd, DontKnowIfDead)> <em>*<eval year_p bd></em>
-        <with (_, Death _ dd)> <em>+<eval year_p dd></em>
-        <with _>
-        </match>
-      </if>
-    </for><strip>
+    </if>
     <if list_length (children fam) != 0>
-      <if are_not_married fam AND auth p AND auth (spouse p fam)>
+      <if are_not_married fam AND auth p AND auth sp>
       <else>, <eval transl "having as children">
       </if>
       <ul>
       <for c in (children fam)>
       <li>
         <if sex p = 0 AND surname c != surname p OR
-            sex p = 1 AND surname c != surname (spouse p fam)>
+            sex p = 1 AND surname c != surname sp>
           <a href="`commd``access c`"><eval first_name c> <eval surname c></a>
         <else>
           <a href="`commd``access c`"><eval first_name c></a>
@@ -410,7 +413,8 @@
     <a href="`commd``access p`;m=D"><eval transl "Descendants"></a> /
   </if>
   <if has_grand_parents p>
-    <a href="`commd``access p`;m=C"><eval transl "Cousins (general term)"></a> /
+    <a href="`commd``access p`;m=C">
+    <eval transl "Cousins (general term)"></a> /
   </if>
   </h4>
   <p>

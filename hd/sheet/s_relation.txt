@@ -1,5 +1,5 @@
 <comm param = p1,p2,result>
-<comm e="$Id: s_relation.txt,v 1.1.2.1 1999-04-11 01:19:12 ddr Exp $">
+<comm e="$Id: s_relation.txt,v 1.1.2.2 1999-04-11 19:28:12 ddr Exp $">
 <comm e="Copyright (c) 1999 INRIA">
 <comm
   Context:
@@ -33,7 +33,7 @@
 <with None>
   <if p1 = p2><eval transl  "It is the same person!">
   <else>
-    <format (transl "No known relationship link between %t and %t")>
+    <format (ftransl "No known relationship link between %t and %t")>
       <match main_title p1>
       <with Some t when not (is_private_access p1)>
         <a href="`commd``access p1`">
@@ -48,6 +48,7 @@
         <em><eval title_ident t> <eval title_place t></em>
       <with _><a href="`commd``access p2`"><eval person_text p2></a>
       </match>
+    </format>
   </if>
 <with Some (rel_list, total, relationship_value)>
   <for (n1, n2, list) in rel_list>
@@ -72,8 +73,9 @@
          (sex p2)>
       <with (n, 0)>
         <eval transl_nth "an ancestor" (sex p2)>
-        <format (transl "of the %s generation")
+        <format (ftransl "of the %s generation")
           (transl_nth "nth (generation)" n)>
+        </format>
       <with (1, 1)>
         <if list_length list = 1>
           <eval transl_nth "a half-brother/a half-sister/a half-sibling"
@@ -84,13 +86,14 @@
       <with (2, 2)><eval transl_nth "a cousin" (sex p2)>
       <with (3, 3)><eval transl_nth "a 2nd cousin" (sex p2)>
       <with (_, _) when n1 = n2>
-        <format (transl_nth "a %s cousin" (sex p2))
+        <format (ftransl_nth "a %s cousin" (sex p2))
            (transl_nth (transl_nth "*nth (cousin)*" (sex p2)) (n1 - 1))>
+        </format>
       <with _>xxx (<eval (string_of_int n1)> <eval (string_of_int n2)>)
       </match>
     </strong>
-    <if n1 GT n2><eval transl_nth "of (person of lower generation level)" 0>
-    <else><eval transl_nth "of" 0></if>
+    <if n2 LT n1><eval transl_nth "of" 0>
+    <else><eval transl_nth "of (same or greater generation level)" 0></if>
     <match main_title p1>
     <with Some t>
       <eval titled_person_text p1 t>,

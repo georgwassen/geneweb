@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.5.2.1 1999-04-11 01:19:13 ddr Exp $ *)
+(* $Id: family.ml,v 2.5.2.2 1999-04-11 19:28:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -55,14 +55,22 @@ value relation_print conf base p =
         [ Some p1 -> do conf.senv := []; return Some p1
         | None -> None ] ]
   in
+(**)
   Sheet.relation_print conf base p p1
+(*
+  match p1 with
+  [ Some p1 ->
+      let rel = Relation.compute_relationship conf base p1 p in
+      S_relation.f conf base p p1 rel
+  | None -> Sheet.relation_print conf base p p1 ]
+*)
 ;
 
 value person_selected conf base p =
   match p_getenv conf.senv "em" with
   [ Some "R" -> relation_print conf base p
   | Some mode -> incorrect_request conf
-  | None -> Sheet.perso_print conf base p ]
+  | None -> (**) Sheet.perso_print conf base p (* S_perso.f conf base p *) ]
 ;
 
 value compact_list conf base xl =

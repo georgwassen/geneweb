@@ -1,18 +1,31 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_sheet.ml,v 1.1.2.2 1999-04-11 10:12:22 ddr Exp $ *)
+(* $Id: pa_sheet.ml,v 1.1.2.3 1999-04-11 19:28:13 ddr Exp $ *)
 
 value token_of_xast =
   fun
-  [ PXML.Xtag "comm" p -> ("COMM", p)
-  | PXML.Xtag "eval" p -> ("EVAL", p)
-  | PXML.Xtag "for" p -> ("FOR", p)
-  | PXML.Xtag "match" p -> ("MATCH", p)
-  | PXML.Xtag "with" p -> ("WITH", p)
-  | PXML.Xtag t "" -> ("TAG", t)
-  | PXML.Xtag t p -> ("TAG", t ^ " " ^ p)
-  | PXML.Xetag "for" -> ("EFOR", "")
-  | PXML.Xetag "match" -> ("EMATCH", "")
-  | PXML.Xetag t -> ("ETAG", t)
+  [ PXML.Xtag t p ->
+      match String.lowercase t with
+      [ "a" -> ("A", p)
+      | "body" -> ("BODY", p)
+      | "comm" -> ("COMM", p)
+      | "else" -> ("ELSE", p)
+      | "eval" -> ("EVAL", p)
+      | "for" -> ("FOR", p)
+      | "format" -> ("FORMAT", p)
+      | "if" -> ("IF", p)
+      | "img" -> ("IMG", p)
+      | "let" -> ("LET", p)
+      | "match" -> ("MATCH", p)
+      | "with" -> ("WITH", p)
+      | t -> if p = "" then ("TAG", t) else ("TAG", t ^ " " ^ p) ]
+  | PXML.Xetag t ->
+      match String.lowercase t with
+      [ "body" -> ("E_BODY", "")
+      | "for" -> ("E_FOR", "")
+      | "format" -> ("E_FORMAT", "")
+      | "if" -> ("E_IF", "")
+      | "match" -> ("E_MATCH", "")
+      | t -> ("ETAG", t) ]
   | PXML.Xtext s -> ("TEXT", s)
   | PXML.Xind i -> ("IND", string_of_int i) ]
 ;
@@ -58,8 +71,9 @@ value lexer_func strm =
 
 value lexer_using (p_con, p_prm) =
   match p_con with
-  [ "COMM" | "EFOR" | "EMATCH" | "EOI" | "ETAG" | "EVAL" | "FOR" | "IND"
-  | "MATCH" | "TAG" | "TEXT" | "WITH" -> ()
+  [ "A" | "BODY" | "COMM" | "E_BODY" | "E_FOR" | "E_FORMAT" | "E_IF"
+  | "E_MATCH" | "ELSE" | "EOI" | "ETAG" | "EVAL" | "FOR" | "FORMAT" | "IF"
+  | "IMG" | "IND" | "LET" | "MATCH" | "TAG" | "TEXT" | "WITH" -> ()
   | _ ->
       raise (Token.Error ("\
 the constructor \"" ^ p_con ^ "\" is not recognized by Plexer")) ]
@@ -75,7 +89,12 @@ value lexer_tparse =
 
 value lexer_text =
   fun
-  [ ("EMATCH", "") -> "'</ematch>'"
+  [ ("E_FOR", "") -> "'</for>'"
+  | ("E_FORMAT", "") -> "'</format>'"
+  | ("E_IF", "") -> "'</if>'"
+  | ("E_MATCH", "") -> "'</match>'"
+  | ("EOI", "") -> "end of input"
+  | ("IND", _) -> "tabulation"
   | (con, "") -> con
   | (con, prm) -> con ^ " \"" ^ prm ^ "\"" ]
 ;
@@ -114,9 +133,31 @@ value expr_of_string loc sh s =
   Pcaml.expr_reloc (freloc loc sh) 0 e
 ;
 
-value patt_in_expr_of_string s =
-  Eval.G.Entry.parse Eval.patt_in_expr_eoi
-    (Eval.G.parsable (Stream.of_string s))
+value simple_expr_list_of_string loc sh s =
+  let (e, el) =
+    Eval.G.Entry.parse Eval.simple_expr_list_eoi
+      (Eval.G.parsable (Stream.of_string s))
+  in
+  (Pcaml.expr_reloc (freloc loc sh) 0 e,
+   List.map (Pcaml.expr_reloc (freloc loc sh) 0) el)
+;
+
+value patt_in_expr_of_string loc sh s =
+  let (p, e) =
+    Eval.G.Entry.parse Eval.patt_in_expr_eoi
+      (Eval.G.parsable (Stream.of_string s))
+  in
+  (Pcaml.patt_reloc (freloc loc sh) 0 p,
+   Pcaml.expr_reloc (freloc loc sh) 0 e)
+;
+
+value patt_eq_expr_of_string loc sh s =
+  let (p, e) =
+    Eval.G.Entry.parse Eval.patt_eq_expr_eoi
+      (Eval.G.parsable (Stream.of_string s))
+  in
+  (Pcaml.patt_reloc (freloc loc sh) 0 p,
+   Pcaml.expr_reloc (freloc loc sh) 0 e)
 ;
 
 value expr_of_expr_list loc =
@@ -181,9 +222,14 @@ value adjust_expr =
     [ <:expr< $e1$ $e2$ >> -> <:expr< $expr env e1$ $expr env e2$ >>
     | <:expr< do $list:el$ return $e$ >> ->
         <:expr< do $list:List.map (expr env) el$ return $expr env e$ >>
+    | <:expr< let $p$ = $e1$ in $e2$ >> ->
+        let nenv = get_defined_ident p @ env in
+        <:expr< let $p$ = $expr env e1$ in $expr nenv e2$ >>
     | <:expr< match $e$ with [ $list:ml$ ] >> ->
         let ml = List.map (match_case env) ml in
         <:expr< match $expr env e$ with [ $list:ml$ ] >>
+    | <:expr< if $e1$ then $e2$ else $e3$ >> ->
+        <:expr< if $expr env e1$ then $expr env e2$ else $expr env e3$ >>
     | <:expr< fun $p$ -> $e$ >> ->
         <:expr< fun $p$ -> $expr (get_defined_ident p @ env) e$ >>
     | <:expr< ($list:el$) >> -> <:expr< ($list:List.map (expr env) el$) >>
@@ -202,8 +248,35 @@ value adjust_expr =
   expr
 ;
 
+value print_with_antiquot loc sh s =
+  eval 0 0 where rec eval i0 i =
+    if i < String.length s then
+      if s.[i] == '`' then
+        let el1 =
+          if i > i0 then
+            let ss = String.sub s i0 (i - i0) in
+            [<:expr< wprint "%s" $str:ss$ >>]
+          else []
+        in
+        if i + 1 == String.length s then el1
+        else
+          let j =
+            try String.index_from s (i + 1) '`' with
+            [ Not_found -> String.length s ]
+          in
+          let ss = String.sub s (i + 1) (j - i - 1) in
+          let e = expr_of_string loc (sh + i + 1) ss in
+          el1 @ [<:expr< wprint "%s" $e$ >> :: eval (j + 1) (j + 1)]
+      else eval i0 (i + 1)
+    else if i > i0 then
+      let ss = String.sub s i0 (i - i0) in
+      [<:expr< wprint "%s" $str:ss$ >>]
+    else []
+;
+
 value glob_no_conf_base =
-  ["+"; "-"; "^"; "="; "<>"; "<"; ">"; "indent"; "wprint"]
+  ["&&"; "||"; "+"; "-"; "^"; "="; "<>"; "<"; ">"; "not"; "string_of_int";
+   "indent"; "wprint"]
 ;
 
 EXTEND
@@ -220,32 +293,72 @@ EXTEND
           defs @ [(si, loc)] ] ]
   ;
   expr:
-    [ [ e = MATCH; ml = LIST0 match_case; EMATCH ->
+    [ [ e = MATCH; ml = LIST0 match_case; E_MATCH ->
           let e = expr_of_string loc (String.length "<match ") e in
           <:expr< match $e$ with [ $list:ml$ ] >>
-      | e = FOR; el = LIST0 expr; EFOR ->
-          let (p, e) = patt_in_expr_of_string e in
+      | e = LET; el = LIST0 expr ->
+          let (p, e) = patt_eq_expr_of_string loc (String.length "<let ") e in
+          let body = expr_of_expr_list loc el in
+          <:expr< let $p$ = $e$ in $body$ >>
+      | e = FOR; el = LIST0 expr; E_FOR ->
+          let (p, e) = patt_in_expr_of_string loc (String.length "<for ") e in
           let body = expr_of_expr_list loc el in
           <:expr< List.iter (fun $p$ -> $body$) $e$ >>
+      | e = IF; el1 = LIST0 expr; ELSE; el2 = LIST0 expr; E_IF ->
+          let e = expr_of_string loc (String.length "<if ") e in
+          let e1 = expr_of_expr_list loc el1 in
+          let e2 = expr_of_expr_list loc el2 in
+          <:expr< if $e$ then $e1$ else $e2$ >>
+      | e = IF; el1 = LIST0 expr; E_IF ->
+          let e = expr_of_string loc (String.length "<if ") e in
+          let e1 = expr_of_expr_list loc el1 in
+          <:expr< if $e$ then $e1$ else () >>
       | e = EVAL ->
           let e = expr_of_string loc (String.length "<eval ") e in
           <:expr< wprint "%s" $e$ >>
+      | e = A ->
+          let s = print_with_antiquot loc (String.length "<a ") e in
+          let el =
+            [<:expr< wprint "<a " >> :: (s @ [<:expr< wprint ">" >>])]
+          in
+          <:expr< do $list:el$ return () >>
+      | e = IMG ->
+          let s = print_with_antiquot loc (String.length "<img ") e in
+          let el =
+            [<:expr< wprint "<img " >> :: (s @ [<:expr< wprint ">" >>])]
+          in
+          <:expr< do $list:el$ return () >>
+      | e = FORMAT; tel = format_expr_list; E_FORMAT ->
+          let (f, sel) =
+            simple_expr_list_of_string loc (String.length "<format ") e
+          in
+          let e = <:expr< wprint $f$ >> in
+          let e = List.fold_left (fun r e -> <:expr< $r$ $e$ >>) e sel in
+          List.fold_left (fun r e -> <:expr< $r$ (fun _ -> $e$) >>) e tel
+      | e = BODY ->
+          if e = "" then
+            <:expr<
+              let s =
+                try " dir=" ^ Hashtbl.find conf.Config.lexicon " !dir" with
+                [ Not_found -> "" ]
+              in
+              let s =
+                try s ^ " " ^ List.assoc "body_prop" conf.Config.base_env with
+                [ Not_found -> s ]
+              in
+              wprint "<body%s>" s >>
+          else <:expr< wprint "<body%s>" $str:e$ >>
+      | E_BODY -> <:expr< wprint "<p><em>Trailer to apply</em>\n</body>" >>
       | i = IND -> <:expr< indent $int:i$ >>
-      | t = TAG -> <:expr< wprint "<%s>" $str:t$ >>
       | t = ETAG -> <:expr< wprint $str:"</" ^ t ^ ">"$ >>
       | t = TEXT -> <:expr< wprint $str:t$ >>
-      | TAG "body" ->
-          <:expr<
-            let s =
-              try " dir=" ^ Hashtbl.find conf.Config.lexicon " !dir" with
-              [ Not_found -> "" ]
-            in
-            let s =
-              try s ^ " " ^ List.assoc "body_prop" conf.Config.base_env with
-              [ Not_found -> s ]
-            in
-            wprint "<body%s>" s >>
+      | t = TAG -> <:expr< wprint "<%s>" $str:t$ >>
       | COMM; e = expr -> e ] ]
+  ;
+  format_expr_list:
+    [ [ IND; el = format_expr_list -> el
+      | e = expr; el = format_expr_list -> [e :: el]
+      | -> [] ] ]
   ;
   match_case:
     [ [ p = WITH; el = LIST0 expr ->

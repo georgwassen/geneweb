@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: global.ml,v 1.1.2.6 1999-04-11 01:19:14 ddr Exp $ *)
+(* $Id: global.ml,v 1.1.2.7 1999-04-11 19:28:13 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -93,6 +93,13 @@ value list =
        Obj.repr
          (GlobDef.first_names_aliases conf base : person -> list string),
      <:ctyp< person -> list string >>));
+   ("ftransl",
+    (fun conf base -> Obj.repr (GlobDef.transl conf base : string -> string),
+     <:ctyp< string -> string >>));
+   ("ftransl_nth",
+    (fun conf base ->
+       Obj.repr (GlobDef.transl_nth conf base : string -> int -> string),
+     <:ctyp< string -> int -> string >>));
    ("has_titles",
     (fun conf base ->
        Obj.repr (GlobDef.has_titles conf base : person -> bool),
@@ -158,7 +165,7 @@ value list =
     (fun conf base -> Obj.repr (GlobDef.mother conf base : family -> person),
      <:ctyp< family -> person >>));
    ("not",
-    (fun conf base -> Obj.repr (GlobDef.not conf base : bool -> bool),
+    (fun conf base -> Obj.repr (not : bool -> bool),
      <:ctyp< bool -> bool >>));
    ("notes",
     (fun conf base -> Obj.repr (GlobDef.notes conf base : person -> string),
@@ -204,20 +211,23 @@ value list =
      <:ctyp< person -> family -> person >>));
    ("string_length",
     (fun conf base ->
-       Obj.repr (GlobDef.string_length conf base : string -> int),
+       Obj.repr (String.length : string -> int),
      <:ctyp< string -> int >>));
    ("string_of_int",
     (fun conf base ->
-       Obj.repr (GlobDef.string_of_int conf base : int -> string),
+       Obj.repr (string_of_int : int -> string),
      <:ctyp< int -> string >>));
+   ("string_of_num",
+    (fun conf base ->
+       Obj.repr (GlobDef.string_of_num conf base : Num.t -> string),
+     <:ctyp< num -> string >>));
    ("string_of_num_sep",
     (fun conf base ->
        Obj.repr (GlobDef.string_of_num_sep conf base : Num.t -> string),
      <:ctyp< num -> string >>));
    ("string_sub",
     (fun conf base ->
-       Obj.repr
-         (GlobDef.string_sub conf base : string -> int -> int -> string),
+       Obj.repr (String.sub : string -> int -> int -> string),
      <:ctyp< string -> int -> int -> string >>));
    ("surname",
     (fun conf base -> Obj.repr (GlobDef.surname conf base : person -> string),

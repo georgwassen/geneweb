@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: eval.ml,v 1.1.2.7 1999-04-11 01:19:13 ddr Exp $ *)
+(* $Id: eval.ml,v 1.1.2.8 1999-04-11 19:28:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type dyn = { cval : Obj.t; ctyp : MLast.ctyp };
@@ -67,11 +67,13 @@ value error s err t =
 module G = Grammar.Make (struct value lexer = Plexer.make (); end);
 value expr_eoi = G.Entry.create "expr";
 value patt_eoi = G.Entry.create "patt";
+value patt_eq_expr_eoi = G.Entry.create "patt = expr";
 value patt_in_expr_eoi = G.Entry.create "patt in expr";
 value simple_expr_list_eoi = G.Entry.create "simple expr list";
 
 GEXTEND G
-  GLOBAL: expr_eoi patt_eoi patt_in_expr_eoi simple_expr_list_eoi;
+  GLOBAL: expr_eoi patt_eoi patt_in_expr_eoi patt_eq_expr_eoi
+    simple_expr_list_eoi;
   expr_eoi:
     [ [ e = expr; EOI -> e ] ]
   ;
@@ -125,6 +127,9 @@ GEXTEND G
   ;
   patt_in_expr_eoi:
     [ [ p = patt; "in"; e = expr_eoi -> (p, e) ] ]
+  ;
+  patt_eq_expr_eoi:
+    [ [ p = patt; "="; e = expr_eoi -> (p, e) ] ]
   ;
 END;
 
@@ -396,6 +401,15 @@ value patt_in_expr global env s =
     (fun () ->
        let (id, ast) =
          G.Entry.parse patt_in_expr_eoi (G.parsable (Stream.of_string s))
+       in
+       (id, eval_expr global env ast))
+;
+
+value patt_eq_expr global env s =
+  wrap s
+    (fun () ->
+       let (id, ast) =
+         G.Entry.parse patt_eq_expr_eoi (G.parsable (Stream.of_string s))
        in
        (id, eval_expr global env ast))
 ;
