@@ -16,6 +16,13 @@ value commd_no_params conf =
       "" conf.henv
 ;
 
+value escape_amp s =
+  loop 0 0 where rec loop i len =
+    if i = String.length s then Buff.get len
+    else if s.[i] = '&' then loop (i + 1) (Buff.mstore len "&amp;")
+    else loop (i + 1) (Buff.store len s.[i])
+;
+
 value link_to_referer conf =
   let referer = Wserver.extract_param "referer: " '\n' conf.request in
   if referer <> "" then
@@ -28,7 +35,7 @@ value link_to_referer conf =
       | None -> "" ]
     in
     sprintf "<a href=\"%s\"><img src=\"%s/%s\"%s alt=\"&lt;&lt;\" title=\"&lt;&lt;\"%s></a>\n"
-      referer (Util.image_prefix conf) fname wid_hei conf.xhs
+      (escape_amp referer) (Util.image_prefix conf) fname wid_hei conf.xhs
   else ""
 ;
 
