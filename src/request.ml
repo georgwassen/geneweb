@@ -397,6 +397,7 @@ value family_m conf base =
       match p_getenv conf.env "v" with
       [ Some x -> Birthday.print_marriage conf base (int_of_string x)
       | _ -> Birthday.print_menu_marriage conf base ]
+  | Some "API_INFO_BASE" -> BirthDeath.print_info_base conf base
   | Some "AS_OK" -> AdvSearchOk.print conf base
   | Some "B" when conf.wizard || conf.friend ->
       BirthDeath.print_birth conf base

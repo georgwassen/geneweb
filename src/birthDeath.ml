@@ -8,6 +8,53 @@ open Gwdb;
 open Hutil;
 open Util;
 
+type info_base = 
+  { nb_of_persons : int;
+    nb_of_families : int;
+    nb_of_males : int;
+    nb_of_females : int;
+    nb_of_unknown : int }
+;
+
+value update_info_base conf base =
+  let nb_of_persons = Gwdb.nb_of_persons base in
+  let nb_of_families = Gwdb.nb_of_families base in
+  let (nb_of_males, nb_of_females, nb_of_unknown) =
+    let rec loop i m f n =
+      if i = nb_of_persons then (m, f, n)
+      else
+        let p = pget conf base (Adef.iper_of_int i) in
+        match get_sex p with
+        [ Male -> loop (i + 1) (m + 1) f n
+        | Female -> loop (i + 1) m (f + 1) n
+        | Neuter -> loop (i + 1) m f (n + 1) ]
+    in loop 0 0 0 0
+  in
+  let info_base = 
+    { nb_of_persons = nb_of_persons; nb_of_families = nb_of_families; 
+      nb_of_males = nb_of_males; nb_of_females = nb_of_females; 
+      nb_of_unknown = nb_of_unknown }
+  in
+  info_base
+;
+
+value print_info_base conf base = 
+  let info_base = update_info_base conf base in
+  let title _ = Wserver.wprint "INFO BASE" in
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    tag "ul" begin
+      Wserver.wprint "<li>%s : %d</li>" (transl_nth conf "person/persons" 1) info_base.nb_of_persons;
+      Wserver.wprint "<li>%s : %d</li>" (transl_nth conf "family/families" 1) info_base.nb_of_families;
+      Wserver.wprint "<li>male : %d</li>" info_base.nb_of_males;
+      Wserver.wprint "<li>female : %d</li>" info_base.nb_of_females;
+      Wserver.wprint "<li>unknown : %d</li>" info_base.nb_of_unknown;
+    end;
+    trailer conf
+  }
+;
+
 value get_k conf =
   match p_getint conf.env "k" with
   [ Some x -> x

@@ -57,6 +57,10 @@
   </ul>
 %end;
 
+<ul>
+  <li><a href="%prefix;m=API_INFO_BASE;">Info base</a></li>
+</ul>
+
 %base_trailer;
 %copyright;
 </body>
