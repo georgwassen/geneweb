@@ -264,6 +264,105 @@ value has_children_with_that_name conf base des name =
     (Array.to_list (get_children des))
 ;
 
+(* FLH : API *)
+value name_print_list conf base x1 xl liste = do {
+  let liste =
+    let l =
+      List.sort
+        (fun x1 x2 ->
+           match alphabetic (p_surname base x1) (p_surname base x2) with
+           [ 0 ->
+               match
+                 (Adef.od_of_codate (get_birth x1),
+                  Adef.od_of_codate (get_birth x2))
+               with
+               [ (Some d1, Some d2) ->
+                   if CheckItem.strictly_after d1 d2 then -1 else 1
+               | (Some d1, _) -> 1
+               | _ -> -1 ]
+           | n -> -n  ])
+        liste
+    in
+    List.fold_left
+      (fun l x ->
+         let px = p_surname base x in
+         match l with
+         [ [(p, l1) :: l] when alphabetic px p = 0 -> [(p, [x :: l1]) :: l]
+         | _ -> [(px, [x]) :: l] ])
+      [] l
+  in
+  let list =
+    List.map
+      (fun (sn, ipl) ->
+         let txt = Util.surname_end base sn ^ Util.surname_begin base sn in
+         let ord = name_unaccent txt in
+         (ord, txt, ipl))
+      liste
+  in
+  let list = List.sort compare list in
+  let print_e conf base is_surname (p, xl) =
+  list_iter_first
+    (fun first x ->
+       do {
+         if not first then Wserver.wprint "</li>\n<li>\n "
+         else ();
+         Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
+         if is_surname then
+           Wserver.wprint "%s%s" (surname_end base p) (surname_begin base p)
+         else Wserver.wprint "%s" p;
+         Wserver.wprint " %s" (sou base (get_first_name x));
+         Wserver.wprint "</a>";
+         Wserver.wprint "%s" (Date.short_dates_text conf base x);
+         let faml = Array.to_list (get_family x)
+         in
+         let fl = 
+           List.map 
+             (fun ifam -> 
+               let fam = foi base ifam in
+               let c = spouse (get_key_index x) fam in
+               pget conf base c
+             )
+             faml
+         in
+         List.iter 
+           (fun w -> Wserver.wprint " %s %s," (sou base (get_first_name w)) (sou base (get_surname w))) 
+           fl;
+         (*
+         Wserver.wprint " <em>";
+         specify_homonymous conf base x;
+         Wserver.wprint "</em>\n";
+         *)
+       })
+    xl
+  in
+  print_alphab_list conf (fun (ord, txt, _) -> first_char ord)
+    (fun (_, txt, ipl) -> print_e conf base True (txt, ipl)) list;
+};
+
+
+(* FLH : API *)
+value name_print conf base x =
+  let (list, _) =
+      persons_of_fsname conf base base_strings_of_surname
+        (spi_find (persons_of_surname base)) get_surname x
+  in
+  let list =
+    List.map
+      (fun (str, istr, iperl) ->
+         (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
+      list
+  in
+  let list = List.fold_right merge_insert list [] in
+  match list with
+  [ [] -> ()
+  | [(_, (strl, iperl))] ->
+      let iperl = list_uniq (List.sort compare iperl) in
+      let pl = List.map (pget conf base) iperl in
+      name_print_list conf base x strl pl
+  | _ -> () ]
+;
+
+
 (* List selection bullets *)
 
 value bullet_sel_txt = "<tt>o</tt>";

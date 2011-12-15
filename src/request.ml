@@ -398,6 +398,7 @@ value family_m conf base =
       [ Some x -> Birthday.print_marriage conf base (int_of_string x)
       | _ -> Birthday.print_menu_marriage conf base ]
   | Some "API_INFO_BASE" -> BirthDeath.print_info_base conf base
+  | Some "API_SEARCH" -> Alln.print_all conf base
   | Some "AS_OK" -> AdvSearchOk.print conf base
   | Some "B" when conf.wizard || conf.friend ->
       BirthDeath.print_birth conf base
